@@ -73,7 +73,7 @@ A web based app that allows the creation, editing and deletion of invoices.
 ## Data Model
 
 
-[﻿Data Model](https://app.eraser.io/workspace/pk4x6Qf2yW4iIWA0qDis?elements=HeBRd7nOO-KInGVeC58OOQ)  
+![Data Model](/.eraser/pk4x6Qf2yW4iIWA0qDis___CPD07GfrQMaqPBhpxFXyqNLI4YC3___---figure---FFksyMooWwd9_4Qiv3Mox---figure---HeBRd7nOO-KInGVeC58OOQ.png "Data Model")
 
 
 
