@@ -32,6 +32,7 @@ func NewInvoice() *Invoice {
 		ID:        id,
 		CreatedAt: time.Now(),
 		Status:    STATUS_DRAFT,
+		Total:     *money.New(0, money.GBP),
 	}
 }
 
