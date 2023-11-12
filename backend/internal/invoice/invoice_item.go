@@ -2,7 +2,7 @@ package invoice
 
 import "github.com/Rhymond/go-money"
 
-type Invoice_item struct {
+type InvoiceItem struct {
 	Quantity int
 	Item     Item
 	Total    money.Money
