@@ -2,6 +2,8 @@ package invoice
 
 import (
 	"context"
+	"fmt"
+
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
@@ -18,8 +20,11 @@ type PostgresRepository struct {
 }
 
 func NewPostgresRespository(connectionURI string) (*PostgresRepository, error) {
-	//TODO
-	return nil, nil
+	conn, err := sqlx.Open("postgres", connectionURI)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open Postgres connection: %w", err)
+	}
+	return &PostgresRepository{conn: conn}, nil
 }
 
 func (pr *PostgresRepository) GetInvoiceByID(ctx context.Context, id uuid.UUID) (*Invoice, error) {
