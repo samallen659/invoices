@@ -7,7 +7,7 @@ CREATE TABLE client (
 CREATE TABLE item (
 	id SERIAL PRIMARY KEY,
 	name TEXT NOT NULL,
-	price MONEY NOT NULL
+	price NUMERIC(6, 2) NOT NULL
 );
 
 CREATE TABLE address (
@@ -26,7 +26,7 @@ CREATE TABLE invoice (
     client_id SERIAL REFERENCES client(id),
     payment_terms INT,
     status TEXT,
-    total INT,
+    total NUMERIC(8,2),
     sender_address_id SERIAL REFERENCES address(id),
     client_address_id SERIAL REFERENCES address(id)
 );
@@ -35,7 +35,7 @@ CREATE TABLE invoice_item (
 	invoice_id UUID REFERENCES invoice(id),
 	item_id SERIAL REFERENCES item(id),
 	quantity INT,
-	total MONEY,
+	total NUMERIC(8,2),
 	PRIMARY KEY (invoice_id, item_id)
 );
 

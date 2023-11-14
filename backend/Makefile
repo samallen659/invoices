@@ -29,4 +29,7 @@ postgres:
 migrate:
 	@migrate -source file://db/migrations -database postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:${POSTGRES_PORT}/${POSTGRES_DB}?sslmode=disable up
 
+migrate-down:
+	@migrate -source file://db/migrations -database postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:${POSTGRES_PORT}/${POSTGRES_DB}?sslmode=disable down
+
 .PHONY: all build run test clean postgres migrate
