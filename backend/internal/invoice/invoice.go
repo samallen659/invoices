@@ -2,10 +2,8 @@ package invoice
 
 import (
 	"errors"
-	"time"
-
-	"github.com/Rhymond/go-money"
 	"github.com/google/uuid"
+	"time"
 )
 
 type InvoiceStatus string
@@ -29,7 +27,7 @@ type Invoice struct {
 	ClientAddress Address
 	SenderAddress Address
 	InvoiceItems  []InvoiceItem
-	Total         money.Money
+	Total         float32
 }
 
 // Returns a new NewInvoice
@@ -41,7 +39,7 @@ func NewInvoice() *Invoice {
 		ID:        id,
 		CreatedAt: time.Now(),
 		Status:    STATUS_DRAFT,
-		Total:     *money.New(0, money.GBP),
+		Total:     float32(0),
 	}
 }
 
