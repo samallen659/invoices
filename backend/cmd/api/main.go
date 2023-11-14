@@ -35,4 +35,13 @@ func main() {
 	}
 	fmt.Println(inv)
 
+	invs, err := repo.GetAllInvoices(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, in := range invs {
+		fmt.Println("invoice....")
+		fmt.Println(*in)
+	}
 }
