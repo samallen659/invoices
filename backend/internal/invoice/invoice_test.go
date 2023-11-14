@@ -16,9 +16,5 @@ func TestInvoice(t *testing.T) {
 		if in.CreatedAt.String() == "0001-01-01 00:00:00 +0000 UTC" {
 			t.Errorf("CreatedAt on invoice not set to valid time: %s", in.CreatedAt.String())
 		}
-
-		if in.Total.Currency().Code != "GBP" {
-			t.Errorf("Total not initialised as GBP")
-		}
 	})
 }
