@@ -121,33 +121,6 @@ func (pr *PostgresRepository) GetInvoiceByID(ctx context.Context, id string) (*I
 	return &invoice, nil
 }
 
-func (pr *PostgresRepository) getInvoiceItems(invoice *Invoice) error {
-	rows, err := pr.conn.Queryx(GET_INVOICE_ITEMS, invoice.ID)
-	if err != nil {
-		fmt.Println(err)
-		return errors.New("failed to run query to get invoice items")
-	}
-
-	for rows.Next() {
-		var invoiceItem InvoiceItem
-
-		err := rows.Scan(
-			&invoiceItem.Item.Name,
-			&invoiceItem.Item.Price,
-			&invoiceItem.Quantity,
-			&invoiceItem.Total,
-		)
-
-		if err != nil {
-			return fmt.Errorf("failed scanning rows into invoiceItem: %w", err)
-		}
-
-		invoice.InvoiceItems = append(invoice.InvoiceItems, invoiceItem)
-	}
-
-	return nil
-}
-
 func (pr *PostgresRepository) GetAllInvoices(ctx context.Context) ([]*Invoice, error) {
 	rows, err := pr.conn.Queryx(GET_ALL_INVOICE_QUERY)
 	if err != nil {
@@ -194,7 +167,85 @@ func (pr *PostgresRepository) GetAllInvoices(ctx context.Context) ([]*Invoice, e
 	return invoices, nil
 }
 
+func (pr *PostgresRepository) getInvoiceItems(invoice *Invoice) error {
+	rows, err := pr.conn.Queryx(GET_INVOICE_ITEMS, invoice.ID)
+	if err != nil {
+		fmt.Println(err)
+		return errors.New("failed to run query to get invoice items")
+	}
+
+	for rows.Next() {
+		var invoiceItem InvoiceItem
+
+		err := rows.Scan(
+			&invoiceItem.Item.Name,
+			&invoiceItem.Item.Price,
+			&invoiceItem.Quantity,
+			&invoiceItem.Total,
+		)
+
+		if err != nil {
+			return fmt.Errorf("failed scanning rows into invoiceItem: %w", err)
+		}
+
+		invoice.InvoiceItems = append(invoice.InvoiceItems, invoiceItem)
+	}
+
+	return nil
+}
+
 func (pr *PostgresRepository) StoreInvoice(ctx context.Context, invoice Invoice) error {
-	//TODO
+	tx, err := pr.conn.Beginx()
+	if err != nil {
+		return errors.New("failed to start sql transaction")
+	}
+	defer tx.Rollback()
+
+	var clientID int
+	err = tx.QueryRowx("INSERT INTO client(client_name, client_email) VALUES ($1, $2) RETURNING id",
+		invoice.Client.ClientName, invoice.Client.ClientEmail).Scan(&clientID)
+	if err != nil {
+		return errors.New("failed on INSERT INTO client")
+	}
+
+	var senderAddressID int
+	err = tx.QueryRowx("INSERT INTO address(street, city, post_code, country) VALUES ($1, $2, $3, $4) RETURNING id",
+		invoice.SenderAddress.Street, invoice.SenderAddress.City, invoice.SenderAddress.PostCode, invoice.SenderAddress.Country).Scan(&senderAddressID)
+	if err != nil {
+		return errors.New("failed on INSERT INTO address for SenderAddress")
+	}
+
+	var clientAddressID int
+	err = tx.QueryRowx("INSERT INTO address(street, city, post_code, country) VALUES ($1, $2, $3, $4) RETURNING id",
+		invoice.ClientAddress.Street, invoice.ClientAddress.City, invoice.ClientAddress.PostCode, invoice.ClientAddress.Country).Scan(&clientAddressID)
+	if err != nil {
+		return errors.New("failed on INSERT INTO address for ClientAddress")
+	}
+
+	_, err = tx.Exec(`INSERT INTO invoice(id, created_at, payment_due, description, client_id, payment_terms, status, total, sender_address_id, client_address_id)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`, invoice.ID, invoice.CreatedAt, invoice.PaymentDue, invoice.Description, clientID, invoice.PaymentTerms,
+		invoice.Status, invoice.Total, senderAddressID, clientAddressID)
+	if err != nil {
+		return errors.New("failed on INSERT INTO invoice")
+	}
+
+	for _, iItem := range invoice.InvoiceItems {
+		var itemID int
+		err = tx.QueryRowx("INSERT INTO item(name, price) VALUES ($1, $2) RETURNING id", iItem.Item.Name, iItem.Item.Price).Scan(&itemID)
+		if err != nil {
+			return errors.New("failed on INSERT INTO item")
+		}
+
+		_, err = tx.Exec("INSERT INTO invoice_item(invoice_id, item_id, quantity, total) VALUES ($1, $2, $3, $4)",
+			invoice.ID, itemID, iItem.Quantity, iItem.Total)
+		if err != nil {
+			return errors.New("failed on INSERT INTO invoice_item")
+		}
+	}
+
+	if err = tx.Commit(); err != nil {
+		return errors.New("failed Commiting transaction to database")
+	}
+
 	return nil
 }
