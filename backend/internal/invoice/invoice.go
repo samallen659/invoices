@@ -1,4 +1,4 @@
-package invoicing
+package invoice
 
 import (
 	"errors"

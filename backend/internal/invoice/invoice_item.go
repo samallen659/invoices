@@ -1,4 +1,4 @@
-package invoicing
+package invoice
 
 type InvoiceItem struct {
 	Quantity int

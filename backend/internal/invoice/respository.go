@@ -1,4 +1,4 @@
-package invoicing_repo
+package invoice
 
 import (
 	"context"
@@ -8,7 +8,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	"github.com/samallen659/invoices/backend/internal/invoicing"
 )
 
 type Repository interface {
