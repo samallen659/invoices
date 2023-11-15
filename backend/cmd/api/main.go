@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/joho/godotenv"
 	"github.com/samallen659/invoices/backend/internal/invoice"
 )
@@ -31,7 +32,11 @@ func main() {
 	}
 
 	ctx := context.Background()
-	inv, err := repo.GetInvoiceByID(ctx, "c1aa569f-87ff-4b5c-9c27-45fd24e29642")
+	u, err := uuid.Parse("c1aa569f-87ff-4b5c-9c27-45fd24e29642")
+	if err != nil {
+		log.Fatal(err)
+	}
+	inv, err := repo.GetInvoiceByID(ctx, u)
 	if err != nil {
 		log.Fatal(err)
 	}
