@@ -1,13 +1,13 @@
-package invoice_test
+package invoicing_test
 
 import (
-	"github.com/samallen659/invoices/backend/internal/invoice"
+	"github.com/samallen659/invoices/backend/internal/invoicing"
 	"testing"
 )
 
 func TestInvoice(t *testing.T) {
 	t.Run("NewInvoice returns an Invoice with UUID set ID, CreatedAt set and 0 Money for total", func(t *testing.T) {
-		in := invoice.NewInvoice()
+		in := invoicing.NewInvoice()
 
 		if in.ID.String() == "00000000-0000-0000-0000-000000000000" {
 			t.Errorf("ID on invoice not set to valid UUID: %s", in.ID.String())

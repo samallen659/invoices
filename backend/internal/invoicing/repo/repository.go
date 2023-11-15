@@ -1,4 +1,4 @@
-package invoice
+package invoicing_repo
 
 import (
 	"context"
@@ -8,12 +8,13 @@ import (
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
+	"github.com/samallen659/invoices/backend/internal/invoicing"
 )
 
 type Repository interface {
-	GetInvoiceByID(ctx context.Context, id uuid.UUID) (*Invoice, error)
-	GetAllInvoices(ctx context.Context) ([]*Invoice, error)
-	StoreInvoice(ctx context.Context, invoice Invoice) error
+	GetInvoiceByID(ctx context.Context, id uuid.UUID) (*invoicing.Invoice, error)
+	GetAllInvoices(ctx context.Context) ([]*invoicing.Invoice, error)
+	StoreInvoice(ctx context.Context, invoice invoicing.Invoice) error
 }
 
 const (
@@ -85,8 +86,8 @@ func NewPostgresRespository(connectionURI string) (*PostgresRepository, error) {
 	return &PostgresRepository{conn: conn}, nil
 }
 
-func (pr *PostgresRepository) GetInvoiceByID(ctx context.Context, id string) (*Invoice, error) {
-	var invoice Invoice
+func (pr *PostgresRepository) GetInvoiceByID(ctx context.Context, id string) (*invoicing.Invoice, error) {
+	var invoice invoicing.Invoice
 	err := pr.conn.QueryRowx(GET_INVOICE_BY_ID_QUERY, id).Scan(
 		&invoice.ID,
 		&invoice.CreatedAt,
@@ -121,16 +122,16 @@ func (pr *PostgresRepository) GetInvoiceByID(ctx context.Context, id string) (*I
 	return &invoice, nil
 }
 
-func (pr *PostgresRepository) GetAllInvoices(ctx context.Context) ([]*Invoice, error) {
+func (pr *PostgresRepository) GetAllInvoices(ctx context.Context) ([]*invoicing.Invoice, error) {
 	rows, err := pr.conn.Queryx(GET_ALL_INVOICE_QUERY)
 	if err != nil {
 		return nil, errors.New("failed to run query against database")
 	}
 	defer rows.Close()
 
-	var invoices []*Invoice
+	var invoices []*invoicing.Invoice
 	for rows.Next() {
-		var invoice Invoice
+		var invoice invoicing.Invoice
 
 		err := rows.Scan(
 			&invoice.ID,
@@ -167,7 +168,7 @@ func (pr *PostgresRepository) GetAllInvoices(ctx context.Context) ([]*Invoice, e
 	return invoices, nil
 }
 
-func (pr *PostgresRepository) getInvoiceItems(invoice *Invoice) error {
+func (pr *PostgresRepository) getInvoiceItems(invoice *invoicing.Invoice) error {
 	rows, err := pr.conn.Queryx(GET_INVOICE_ITEMS, invoice.ID)
 	if err != nil {
 		fmt.Println(err)
@@ -175,7 +176,7 @@ func (pr *PostgresRepository) getInvoiceItems(invoice *Invoice) error {
 	}
 
 	for rows.Next() {
-		var invoiceItem InvoiceItem
+		var invoiceItem invoicing.InvoiceItem
 
 		err := rows.Scan(
 			&invoiceItem.Item.Name,
@@ -194,7 +195,7 @@ func (pr *PostgresRepository) getInvoiceItems(invoice *Invoice) error {
 	return nil
 }
 
-func (pr *PostgresRepository) StoreInvoice(ctx context.Context, invoice Invoice) error {
+func (pr *PostgresRepository) StoreInvoice(ctx context.Context, invoice invoicing.Invoice) error {
 	tx, err := pr.conn.Beginx()
 	if err != nil {
 		return errors.New("failed to start sql transaction")

@@ -1,4 +1,4 @@
-package invoice
+package invoicing
 
 type Item struct {
 	Name  string
