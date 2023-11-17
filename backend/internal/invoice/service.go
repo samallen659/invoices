@@ -11,6 +11,7 @@ type Service struct {
 }
 
 func NewService(repo Repository) (*Service, error) {
+	//TODO: checks
 	return &Service{repo: repo}, nil
 }
 
@@ -30,4 +31,9 @@ func (s *Service) GetByID(ctx context.Context, id uuid.UUID) (*Invoice, error) {
 	}
 
 	return invoice, nil
+}
+
+func (s *Service) NewInvoice(ctx context.Context, invoiceRequest InvoiceRequest) (*Invoice, error) {
+	//TODO
+	return nil, nil
 }
