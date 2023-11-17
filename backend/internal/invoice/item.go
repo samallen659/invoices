@@ -13,7 +13,7 @@ type InvoiceItem struct {
 	Total    float64
 }
 
-func InvoiceItemFactory(name string, price float64, quantity int) (*InvoiceItem, error) {
+func NewInvoiceItem(name string, price float64, quantity int) (*InvoiceItem, error) {
 	if name == "" {
 		return nil, errors.New("name cannot be emtpy")
 	}

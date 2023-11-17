@@ -5,21 +5,21 @@ import (
 	"testing"
 )
 
-func TestInvoiceItemFactory(t *testing.T) {
+func TestNewInvoiceItem(t *testing.T) {
 	t.Run("Pass empty name string", func(t *testing.T) {
-		_, err := invoice.InvoiceItemFactory("", 1.0, 1)
+		_, err := invoice.NewInvoiceItem("", 1.0, 1)
 		if err == nil {
 			t.Error("Expected error for emtpy name string")
 		}
 	})
 	t.Run("Pass less than 0.0 price", func(t *testing.T) {
-		_, err := invoice.InvoiceItemFactory("test", -1.0, 1)
+		_, err := invoice.NewInvoiceItem("test", -1.0, 1)
 		if err == nil {
 			t.Error("Expected error for less than 0.0 price")
 		}
 	})
 	t.Run("Pass less than 1 quantity", func(t *testing.T) {
-		_, err := invoice.InvoiceItemFactory("test", 1.0, 0)
+		_, err := invoice.NewInvoiceItem("test", 1.0, 0)
 		if err == nil {
 			t.Error("Expected error for less than 1 quantity")
 		}
@@ -27,7 +27,7 @@ func TestInvoiceItemFactory(t *testing.T) {
 
 	t.Run("Returns an InvoiceItem with nested Item", func(t *testing.T) {
 		name, price, quantity := "Item", 25.99, 3
-		it, err := invoice.InvoiceItemFactory(name, price, quantity)
+		it, err := invoice.NewInvoiceItem(name, price, quantity)
 		if err != nil {
 			t.Errorf("Recieved an error: %s", err.Error())
 		}
