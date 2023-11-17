@@ -27,7 +27,7 @@ type Invoice struct {
 	ClientAddress Address
 	SenderAddress Address
 	InvoiceItems  []InvoiceItem
-	Total         float32
+	Total         float64
 }
 
 // Returns a new NewInvoice
@@ -39,7 +39,6 @@ func NewInvoice() *Invoice {
 		ID:        id,
 		CreatedAt: time.Now(),
 		Status:    STATUS_DRAFT,
-		Total:     float32(0),
 	}
 }
 
