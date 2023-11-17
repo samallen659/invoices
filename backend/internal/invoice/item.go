@@ -4,16 +4,16 @@ import "errors"
 
 type Item struct {
 	Name  string
-	Price float32
+	Price float64
 }
 
 type InvoiceItem struct {
 	Quantity int
 	Item     Item
-	Total    float32
+	Total    float64
 }
 
-func InvoiceItemFactory(name string, price float32, quantity int) (*InvoiceItem, error) {
+func InvoiceItemFactory(name string, price float64, quantity int) (*InvoiceItem, error) {
 	if name == "" {
 		return nil, errors.New("name cannot be emtpy")
 	}
@@ -24,6 +24,14 @@ func InvoiceItemFactory(name string, price float32, quantity int) (*InvoiceItem,
 		return nil, errors.New("quantity must be greater than 0")
 	}
 
-	//TODO
-	return nil, nil
+	total := price * float64(quantity)
+	invoiceItem := &InvoiceItem{
+		Item: Item{
+			Name:  name,
+			Price: price,
+		},
+		Quantity: quantity,
+		Total:    total,
+	}
+	return invoiceItem, nil
 }
