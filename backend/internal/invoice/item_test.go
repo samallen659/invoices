@@ -36,7 +36,7 @@ func TestInvoiceItemFactory(t *testing.T) {
 			t.Error("Received nil InvoiceItem")
 		}
 
-		if (*it).Item.Name != name {
+		if it.Item.Name != name {
 			t.Errorf("Incorrect name, expected: %s recieved: %s", name, it.Item.Name)
 		}
 
