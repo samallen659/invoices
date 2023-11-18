@@ -5,24 +5,25 @@ import (
 )
 
 type InvoiceRequest struct {
-	PaymentDue    time.Time `json:"paymentDue"`
-	Description   string    `json:"description"`
-	PaymentTerms  int       `json:"paymentTerms"`
-	ClientName    string    `json:"clientName"`
-	ClientEmail   string    `json:"clientEmail"`
-	Status        string    `json:"status"`
-	SenderAddress struct {
-		Street   string `json:"street"`
-		City     string `json:"city"`
-		PostCode string `json:"postCode"`
-		Country  string `json:"country"`
-	} `json:"senderAddress"`
+	ID            string        `json:"id"`
+	PaymentDue    time.Time     `json:"paymentDue"`
+	Description   string        `json:"description"`
+	PaymentTerms  int           `json:"paymentTerms"`
+	ClientName    string        `json:"clientName"`
+	ClientEmail   string        `json:"clientEmail"`
+	Status        InvoiceStatus `json:"status"`
 	ClientAddress struct {
 		Street   string `json:"street"`
 		City     string `json:"city"`
 		PostCode string `json:"postCode"`
 		Country  string `json:"country"`
 	} `json:"clientAddress"`
+	SenderAddress struct {
+		Street   string `json:"street"`
+		City     string `json:"city"`
+		PostCode string `json:"postCode"`
+		Country  string `json:"country"`
+	} `json:"senderAddress"`
 	Items []struct {
 		Name     string  `json:"name"`
 		Quantity int     `json:"quantity"`
