@@ -3,7 +3,6 @@ package invoice
 import (
 	"context"
 	"fmt"
-
 	"github.com/google/uuid"
 )
 
@@ -45,7 +44,16 @@ func (s *Service) NewInvoice(ctx context.Context, invoiceRequest InvoiceRequest)
 	if err := inv.SetPaymentTerms(invoiceRequest.PaymentTerms); err != nil {
 		return nil, fmt.Errorf("failed creating invoice: %w", err)
 	}
-	if err := inv.SetStatus(inv.Status); err != nil {
+
+	if err := inv.SetStatus(invoiceRequest.Status); err != nil {
+		return nil, fmt.Errorf("failed creating invoice: %w", err)
+	}
+
+	client, err := NewClient(invoiceRequest.ClientName, invoiceRequest.ClientEmail)
+	if err != nil {
+		return nil, fmt.Errorf("failed creating invoice: %w", err)
+	}
+	if err := inv.SetClient(*client); err != nil {
 		return nil, fmt.Errorf("failed creating invoice: %w", err)
 	}
 

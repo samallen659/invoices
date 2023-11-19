@@ -74,7 +74,7 @@ func (i *Invoice) SetPaymentDue(paymentDue time.Time) error {
 
 // Sets Invoice status
 func (i *Invoice) SetStatus(status InvoiceStatus) error {
-	if status != STATUS_DRAFT && status != STATUS_PAID && status != STATUS_PENDING {
+	if status != "pending" && status != "paid" && status != "draft" {
 		return errors.New("status can only be of value 'draft', 'paid' or 'pending'")
 	}
 
@@ -82,7 +82,7 @@ func (i *Invoice) SetStatus(status InvoiceStatus) error {
 	return nil
 }
 
-// Sets Invioce invoiceItems
+// Sets Invoice invoiceItems
 func (i *Invoice) SetInvoiceItems(invoiceItems []InvoiceItem) error {
 	if len(invoiceItems) == 0 {
 		return errors.New("invoiceItems cannot be empty")
@@ -101,6 +101,12 @@ func (i *Invoice) SetClientAddress(addr Address) error {
 
 func (i *Invoice) SetSenderAddress(addr Address) error {
 	i.SenderAddress = addr
+
+	return nil
+}
+
+func (i *Invoice) SetClient(client Client) error {
+	i.Client = client
 
 	return nil
 }
