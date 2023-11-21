@@ -1,14 +1,12 @@
 package main
 
 import (
-	"context"
 	"fmt"
+	"github.com/joho/godotenv"
+	transport "github.com/samallen659/invoices/backend/internal"
+	"github.com/samallen659/invoices/backend/internal/invoice"
 	"log"
 	"os"
-	"time"
-	// "github.com/google/uuid"
-	"github.com/joho/godotenv"
-	"github.com/samallen659/invoices/backend/internal/invoice"
 )
 
 func main() {
@@ -20,7 +18,6 @@ func main() {
 	postgresUser := os.Getenv("POSTGRES_USER")
 	postgresPass := os.Getenv("POSTGRES_PASSWORD")
 	postgresDB := os.Getenv("POSTGRES_DB")
-	// postgresPort := os.Getenv("POSTGRES_PORT")
 
 	postgresConnStr := fmt.Sprintf("user=%s dbname=%s sslmode=disable password=%s host=localhost",
 		postgresUser, postgresDB, postgresPass)
@@ -35,57 +32,15 @@ func main() {
 		log.Fatal(err)
 	}
 
-	ctx := context.Background()
-	paymentDue, _ := time.Parse("2006-01-02", "2023-11-20")
-	invRq := invoice.InvoiceRequest{
-		PaymentDue:   paymentDue,
-		Description:  "testing",
-		PaymentTerms: 2,
-		ClientName:   "Sam Allen",
-		ClientEmail:  "sam@email.com",
-		Status:       "pending",
-		ClientAddress: struct {
-			Street   string `json:"street"`
-			City     string `json:"city"`
-			PostCode string `json:"postCode"`
-			Country  string `json:"country"`
-		}{
-			Street:   "15 Eastfield Road",
-			City:     "Doncaster",
-			PostCode: "DN9 1JQ",
-			Country:  "United Kingdom",
-		},
-		SenderAddress: struct {
-			Street   string `json:"street"`
-			City     string `json:"city"`
-			PostCode string `json:"postCode"`
-			Country  string `json:"country"`
-		}{
-			Street:   "77 High Street",
-			City:     "Doncaster",
-			PostCode: "DN9 1JS",
-			Country:  "United Kingdom",
-		},
-		Items: []struct {
-			Name     string  `json:"name"`
-			Quantity int     `json:"quantity"`
-			Price    float64 `json:"price"`
-		}{{
-			Name:     "Web Design",
-			Quantity: 1,
-			Price:    1499.99,
-		}, {
-			Name:     "Web Development",
-			Quantity: 1,
-			Price:    3649.99,
-		}},
-	}
-
-	inv, err := svc.NewInvoice(ctx, invRq)
+	invHandler, err := invoice.NewHandler(svc)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println(inv)
+	server, err := transport.NewServer(invHandler)
+	if err != nil {
+		log.Fatal(err)
+	}
 
+	server.Serve(":8080")
 }
