@@ -74,7 +74,7 @@ func (i *Invoice) SetPaymentDue(paymentDue time.Time) error {
 
 // Sets Invoice status
 func (i *Invoice) SetStatus(status InvoiceStatus) error {
-	if status != "pending" && status != "paid" && status != "draft" {
+	if status != STATUS_PENDING && status != STATUS_PAID && status != STATUS_DRAFT {
 		return errors.New("status can only be of value 'draft', 'paid' or 'pending'")
 	}
 

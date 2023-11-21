@@ -204,7 +204,7 @@ func clearInvoices(t testing.TB, irs *InvoiceRepoStub) {
 func createInvoiceRequest(t testing.TB) invoice.InvoiceRequest {
 	t.Helper()
 
-	paymentDue, _ := time.Parse("2006-01-02", "2023-11-20")
+	paymentDue := time.Now().Add(24 * time.Hour)
 	invRq := invoice.InvoiceRequest{
 		PaymentDue:   paymentDue,
 		Description:  "testing",
