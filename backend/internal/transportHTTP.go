@@ -9,19 +9,19 @@ import (
 
 type Server struct {
 	invHandler *invoice.Handler
-	router     *mux.Router
+	Router     *mux.Router
 }
 
 func NewServer(invHandler *invoice.Handler) (*Server, error) {
 	router := mux.NewRouter()
 
-	router.HandleFunc("/invoice/{id}", invHandler.HandleGetByID)
+	router.HandleFunc("/invoice/{id}", invHandler.HandleGetByID).Methods(http.MethodGet)
 
-	return &Server{invHandler: invHandler, router: router}, nil
+	return &Server{invHandler: invHandler, Router: router}, nil
 }
 
 func (s *Server) Serve(port string) error {
-	if err := http.ListenAndServe(port, s.router); err != nil {
+	if err := http.ListenAndServe(port, s.Router); err != nil {
 		return err
 	}
 	return nil
