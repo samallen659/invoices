@@ -2,22 +2,24 @@ package invoice_test
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
-	"path/filepath"
-	"runtime"
-	"testing"
-	"time"
-
-	// "github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+	transport "github.com/samallen659/invoices/backend/internal"
 	"github.com/samallen659/invoices/backend/internal/invoice"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
+	"log"
+	"net/http"
+	"net/http/httptest"
+	"path/filepath"
+	"runtime"
+	"testing"
+	"time"
 )
 
 const (
@@ -54,7 +56,30 @@ func TestInvoiceDomain(t *testing.T) {
 		t.Errorf("failed setting up invoice domain for integration test: %s", err.Error())
 	}
 
-	fmt.Println(invHandler)
+	server, err := transport.NewServer(invHandler)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	t.Run("HandleGetByID returns status code 400 for bad ID path variable", func(t *testing.T) {
+		w := httptest.NewRecorder()
+		req, err := http.NewRequest(http.MethodGet, "/invoice/123", nil)
+		if err != nil {
+			t.Fatalf("failed to create http request: %s", err.Error())
+		}
+		server.Router.ServeHTTP(w, req)
+
+		if w.Code != http.StatusBadRequest {
+			t.Errorf("Unexpected error code, received: %d expected: %d", w.Code, http.StatusBadRequest)
+		}
+		var receivedError invoice.ErrorResponse
+		json.Unmarshal(w.Body.Bytes(), &receivedError)
+
+		if receivedError.Error != "invalid UUID length: 3" {
+			t.Errorf("Unexpected error received in body")
+		}
+	})
+
 }
 
 func setupInvoiceDomain(ctx context.Context, connStr string) (*invoice.Handler, error) {
