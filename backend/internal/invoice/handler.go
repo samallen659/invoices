@@ -2,6 +2,7 @@ package invoice
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"net/http"
@@ -68,6 +69,28 @@ func (h *Handler) HandleGetByID(w http.ResponseWriter, r *http.Request) {
 
 	h.writeJson(w, http.StatusOK, InvoiceResponse{Invoice: []*Invoice{inv}})
 	return
+}
+
+func (h *Handler) HandleGetAll(w http.ResponseWriter, r *http.Request) {
+	inv, err := h.svc.GetAll(r.Context())
+	if err != nil {
+		h.writeJson(w, http.StatusBadRequest, ErrorResponse{Error: err.Error()})
+		return
+	}
+
+	h.writeJson(w, http.StatusOK, InvoiceResponse{Invoice: inv})
+	return
+}
+
+func (h *Handler) HandleStore(w http.ResponseWriter, r *http.Request) {
+	var ir InvoiceRequest
+	err := json.NewDecoder(r.Body).Decode(&ir)
+	if err != nil {
+		h.writeJson(w, http.StatusBadRequest, ErrorResponse{Error: err.Error()})
+		return
+	}
+
+	fmt.Println(ir)
 }
 
 func (h *Handler) writeJson(w http.ResponseWriter, status int, data any) {
