@@ -1,19 +1,31 @@
-import Logo from "../../assets/logo.svg"
+import Logo from "../../assets/logo.svg";
+import SunLogo from "../../assets/icon-sun.svg";
+import MoonLogo from "../../assets/icon-moon.svg";
 
 type SideBarProps = {
-    toggleIsDark: () => void;
-    isDark: boolean;
-}
+	toggleIsDark: () => void;
+	isDark: boolean;
+};
 
 function SideBar({ toggleIsDark, isDark }: SideBarProps) {
-    return <div className="flex flex-row bg-indigo-800 lg:flex-col h-20 w-screen lg:h-screen lg:w-[103px] lg:rounded-r-[20px] gap-5">
-        <div className="flex-none w-20 h-20 lg:w-[103px] lg:h-[103px] bg-purple-400 rounded-r-[20px] relative">
-            <img className="absolute z-20 w-6 h-6 lg:w-8 lg:h-8 m-auto left-0 right-0 top-0 bottom-0" src={Logo} alt="Invoices" />
-            <div className="absolute z-0 bottom-0 bg-purple-600 w-20 h-10 lg:w-[103px] lg:h-[51px] rounded-tl-[20px] rounded-br-[20px]"></div>
-        </div>
-        <div className="flex-auto bg-red-200"></div>
-        <div className="flex-none bg-red-200 w-20 h-20 lg:w-[103px] lg:h-[103px] lg:rounded-br-[20px]"></div>
-    </div>
+	return (
+		<div className="flex h-20 w-screen flex-row gap-5 bg-indigo-800 lg:h-screen lg:w-[103px] lg:flex-col lg:rounded-r-[20px]">
+			<div className="relative h-20 w-20 flex-none rounded-r-[20px] bg-purple-400 lg:h-[103px] lg:w-[103px]">
+				<img
+					className="absolute bottom-0 left-0 right-0 top-0 z-20 m-auto h-6 w-6 lg:h-8 lg:w-8"
+					src={Logo}
+					alt="Invoices"
+				/>
+				<div className="absolute bottom-0 z-0 h-10 w-20 rounded-br-[20px] rounded-tl-[20px] bg-purple-600 lg:h-[51px] lg:w-[103px]"></div>
+			</div>
+			<div className="flex flex-auto justify-end lg:mx-auto lg:flex-col">
+				<button onClick={toggleIsDark}>
+					<img src={`${isDark ? SunLogo : MoonLogo}`} alt={`${isDark ? "Light Mode" : "Dark Mode"}`} />
+				</button>
+			</div>
+			<div className="h-20 w-20 flex-none lg:h-[103px] lg:w-[103px] lg:rounded-br-[20px]"></div>
+		</div>
+	);
 }
 
-export { SideBar }
+export { SideBar };
