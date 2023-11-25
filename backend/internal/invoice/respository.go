@@ -14,6 +14,7 @@ type Repository interface {
 	GetInvoiceByID(ctx context.Context, id uuid.UUID) (*Invoice, error)
 	GetAllInvoices(ctx context.Context) ([]*Invoice, error)
 	StoreInvoice(ctx context.Context, invoice Invoice) error
+	UpdateInvoice(ctx context.Context, invoice Invoice) error
 }
 
 const (
@@ -229,22 +230,102 @@ func (pr *PostgresRepository) StoreInvoice(ctx context.Context, invoice Invoice)
 		return errors.New("failed on INSERT INTO invoice")
 	}
 
-	for _, iItem := range invoice.InvoiceItems {
+	err = pr.insertInvoiceItems(tx, invoice.ID, invoice.InvoiceItems)
+	if err != nil {
+		return err
+	}
+
+	if err = tx.Commit(); err != nil {
+		return errors.New("failed Commiting transaction to database")
+	}
+
+	return nil
+}
+
+func (pr *PostgresRepository) UpdateInvoice(ctx context.Context, invoice Invoice) error {
+	tx, err := pr.conn.Beginx()
+	if err != nil {
+		return errors.New("failed to start sql transaction")
+	}
+	defer tx.Rollback()
+
+	var clientID string
+	var senderAddressID string
+	var clientAddressID string
+	err = tx.QueryRowx(`UPDATE invoice SET payment_due=$1, description=$2, payment_terms=$3, status=$4, total=$5 
+        WHERE id=$6 RETURNING client_id, sender_address_id, client_address_id`, invoice.PaymentDue, invoice.Description,
+		invoice.PaymentTerms, invoice.Status, invoice.Total, invoice.ID).Scan(&clientID, &senderAddressID, &clientAddressID)
+	if err != nil {
+		return errors.New("failed on UPDATE to invoice")
+	}
+
+	_, err = tx.Exec(`UPDATE client SET client_name=$1, client_email=$2 WHERE client_id=$3`, invoice.Client.ClientName, invoice.Client.ClientEmail, clientID)
+	if err != nil {
+		return errors.New("failed on UPDATE to client")
+	}
+
+	_, err = tx.Exec(`UPDATE address SET street=$1, city=$2, post_code=$3, country=$4 WHERE address_id=$5`, invoice.SenderAddress.Street,
+		invoice.SenderAddress.City, invoice.SenderAddress.PostCode, invoice.SenderAddress.Country, senderAddressID)
+	if err != nil {
+		return errors.New("failed on UPDATE to senderAddress")
+	}
+
+	_, err = tx.Exec(`UPDATE address SET street=$1, city=$2, post_code=$3, country=$4 WHERE address_id=$5`, invoice.ClientAddress.Street,
+		invoice.ClientAddress.City, invoice.ClientAddress.PostCode, invoice.ClientAddress.Country, clientAddressID)
+	if err != nil {
+		return errors.New("failed on UPDATE to clientAddress")
+	}
+
+	rows, err := tx.Queryx(`DELETE FROM invoice_item WHERE invoice_id=$1 RETURNING item_id`, invoice.ID)
+	if err != nil {
+		return errors.New("failed on DELETE to old invoiceItems")
+	}
+	defer rows.Close()
+
+	var itemIDs []int
+	for rows.Next() {
 		var itemID int
-		err = tx.QueryRowx("INSERT INTO item(name, price) VALUES ($1, $2) RETURNING id", iItem.Item.Name, iItem.Item.Price).Scan(&itemID)
+
+		err := rows.Scan(&itemID)
+		if err != nil {
+			return errors.New("failed scanning itemID")
+		}
+
+		itemIDs = append(itemIDs, itemID)
+	}
+
+	for _, id := range itemIDs {
+		_, err = tx.Exec(`DELETE FROM item WHERE id=$1`, id)
+		if err != nil {
+			return errors.New("failed on DELETE to old item")
+		}
+	}
+
+	err = pr.insertInvoiceItems(tx, invoice.ID, invoice.InvoiceItems)
+	if err != nil {
+		return err
+	}
+
+	if err = tx.Commit(); err != nil {
+		return errors.New("failed Commiting transaction to database")
+	}
+
+	return nil
+}
+
+func (pr *PostgresRepository) insertInvoiceItems(tx *sqlx.Tx, invoiceID uuid.UUID, invoiceItems []InvoiceItem) error {
+	for _, iItem := range invoiceItems {
+		var itemID int
+		err := tx.QueryRowx("INSERT INTO item(name, price) VALUES ($1, $2) RETURNING id", iItem.Item.Name, iItem.Item.Price).Scan(&itemID)
 		if err != nil {
 			return errors.New("failed on INSERT INTO item")
 		}
 
 		_, err = tx.Exec("INSERT INTO invoice_item(invoice_id, item_id, quantity, total) VALUES ($1, $2, $3, $4)",
-			invoice.ID, itemID, iItem.Quantity, iItem.Total)
+			invoiceID, itemID, iItem.Quantity, iItem.Total)
 		if err != nil {
 			return errors.New("failed on INSERT INTO invoice_item")
 		}
-	}
-
-	if err = tx.Commit(); err != nil {
-		return errors.New("failed Commiting transaction to database")
 	}
 
 	return nil
