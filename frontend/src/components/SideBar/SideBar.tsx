@@ -23,7 +23,7 @@ function SideBar({ toggleIsDark, isDark }: SideBarProps) {
 					<img src={`${isDark ? SunLogo : MoonLogo}`} alt={`${isDark ? "Light Mode" : "Dark Mode"}`} />
 				</button>
 			</div>
-			<div className="h-20 w-20 flex-none lg:h-[103px] lg:w-[103px] lg:rounded-br-[20px]"></div>
+			<div className="h-20 w-20 flex-none border-l-2 border-indigo-400 lg:h-[103px] lg:w-[103px] lg:rounded-br-[20px] lg:border-l-0 lg:border-t-2"></div>
 		</div>
 	);
 }
