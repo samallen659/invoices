@@ -3,12 +3,10 @@ package invoice_test
 import (
 	"context"
 	"errors"
-	"fmt"
-	"testing"
-	"time"
-
 	"github.com/google/uuid"
 	"github.com/samallen659/invoices/backend/internal/invoice"
+	"testing"
+	"time"
 )
 
 type InvoiceRepoStub struct {
@@ -44,7 +42,13 @@ func (i *InvoiceRepoStub) UpdateInvoice(ctx context.Context, inv *invoice.Invoic
 }
 
 func (i *InvoiceRepoStub) DeleteInvoice(ctx context.Context, id uuid.UUID) error {
-	return nil
+	for j := range i.invoices {
+		if i.invoices[j].ID == id {
+			i.invoices = append(i.invoices[:j], i.invoices[j+1:]...)
+			return nil
+		}
+	}
+	return errors.New("invoice with provided id not found for deletion")
 }
 
 func TestNewService(t *testing.T) {
@@ -59,7 +63,6 @@ func TestNewService(t *testing.T) {
 }
 
 func TestService(t *testing.T) {
-	fmt.Println("hello")
 	irStub := InvoiceRepoStub{}
 	svc, _ := invoice.NewService(&irStub)
 	ctx := context.Background()
@@ -135,6 +138,21 @@ func TestService(t *testing.T) {
 		}
 
 		checkInvoiceAgainstInvoiceRequest(t, inv, invRq)
+	})
+	t.Run("DeleteInvoice deletes invoice from the repository", func(t *testing.T) {
+		clearInvoices(t, &irStub)
+		id := addInvoice(t, &irStub)
+
+		err := svc.DeleteInvoice(ctx, id)
+		if err != nil {
+			t.Fatalf("Received error when none expected: %s", err.Error())
+		}
+
+		for _, inv := range irStub.invoices {
+			if inv.ID == id {
+				t.Fatalf("Invoice with id %s found in repository when expected it to have been deleted", id.String())
+			}
+		}
 	})
 }
 
