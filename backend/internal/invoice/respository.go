@@ -15,6 +15,7 @@ type Repository interface {
 	GetAllInvoices(ctx context.Context) ([]*Invoice, error)
 	StoreInvoice(ctx context.Context, invoice Invoice) error
 	UpdateInvoice(ctx context.Context, invoice *Invoice) error
+	DeleteInvoice(ctx context.Context, id uuid.UUID) error
 }
 
 const (
@@ -304,6 +305,65 @@ func (pr *PostgresRepository) UpdateInvoice(ctx context.Context, invoice *Invoic
 	err = pr.insertInvoiceItems(tx, invoice.ID, invoice.InvoiceItems)
 	if err != nil {
 		return err
+	}
+
+	if err = tx.Commit(); err != nil {
+		return errors.New("failed Commiting transaction to database")
+	}
+
+	return nil
+}
+
+func (pr *PostgresRepository) DeleteInvoice(ctx context.Context, id uuid.UUID) error {
+	tx, err := pr.conn.Beginx()
+	if err != nil {
+		return errors.New("failed to start sql transaction")
+	}
+	defer tx.Rollback()
+
+	var clientID string
+	var senderAddressID string
+	var clientAddressID string
+	err = tx.QueryRowx(`DELETE FROM invoice WHERE id=$1 RETURNING
+        client_id, sender_address_id, client_address_id`, id).Scan(&clientID, &senderAddressID, &clientAddressID)
+	if err != nil {
+		return errors.New("failed to DELETE FROM invoice")
+	}
+
+	_, err = tx.Exec(`DELETE FROM client WHERE id=$1`, clientID)
+	if err != nil {
+		return errors.New("failed to DELETE FROM client")
+	}
+
+	_, err = tx.Exec(`DELETE FROM address WHERE id=$1`, senderAddressID)
+	if err != nil {
+		return errors.New("failed to DELETE FROM address")
+	}
+
+	_, err = tx.Exec(`DELETE FROM address WHERE id=$1`, clientAddressID)
+	if err != nil {
+		return errors.New("failed to DELETE FROM address")
+	}
+
+	rows, err := tx.Queryx(`DELETE FROM invoice_item WHERE invoice_id=$1 RETURNING item_id`, id)
+	if err != nil {
+		return errors.New("failed to DELETE FROM invoice_item")
+	}
+	var invoiceItemIDs []int
+	for rows.Next() {
+		var itemID int
+		err := rows.Scan(&itemID)
+		if err != nil {
+			return errors.New("failed to scan itemID")
+		}
+		invoiceItemIDs = append(invoiceItemIDs, itemID)
+	}
+
+	for _, itemID := range invoiceItemIDs {
+		_, err := tx.Exec(`DELETE FROM item WHERE id=$1`, itemID)
+		if err != nil {
+			return errors.New("failed to DELETE FROM item")
+		}
 	}
 
 	if err = tx.Commit(); err != nil {

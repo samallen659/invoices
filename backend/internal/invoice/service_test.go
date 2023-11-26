@@ -43,6 +43,10 @@ func (i *InvoiceRepoStub) UpdateInvoice(ctx context.Context, inv *invoice.Invoic
 	return errors.New("failed to update invoice in database")
 }
 
+func (i *InvoiceRepoStub) DeleteInvoice(ctx context.Context, id uuid.UUID) error {
+	return nil
+}
+
 func TestNewService(t *testing.T) {
 	irStub := InvoiceRepoStub{}
 	svc, err := invoice.NewService(&irStub)
