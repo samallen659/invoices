@@ -14,7 +14,7 @@ type Repository interface {
 	GetInvoiceByID(ctx context.Context, id uuid.UUID) (*Invoice, error)
 	GetAllInvoices(ctx context.Context) ([]*Invoice, error)
 	StoreInvoice(ctx context.Context, invoice Invoice) error
-	UpdateInvoice(ctx context.Context, invoice Invoice) error
+	UpdateInvoice(ctx context.Context, invoice *Invoice) error
 }
 
 const (
@@ -242,7 +242,7 @@ func (pr *PostgresRepository) StoreInvoice(ctx context.Context, invoice Invoice)
 	return nil
 }
 
-func (pr *PostgresRepository) UpdateInvoice(ctx context.Context, invoice Invoice) error {
+func (pr *PostgresRepository) UpdateInvoice(ctx context.Context, invoice *Invoice) error {
 	tx, err := pr.conn.Beginx()
 	if err != nil {
 		return errors.New("failed to start sql transaction")

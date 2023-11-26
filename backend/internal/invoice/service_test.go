@@ -3,10 +3,12 @@ package invoice_test
 import (
 	"context"
 	"errors"
-	"github.com/google/uuid"
-	"github.com/samallen659/invoices/backend/internal/invoice"
+	"fmt"
 	"testing"
 	"time"
+
+	"github.com/google/uuid"
+	"github.com/samallen659/invoices/backend/internal/invoice"
 )
 
 type InvoiceRepoStub struct {
@@ -31,6 +33,16 @@ func (i *InvoiceRepoStub) StoreInvoice(ctx context.Context, inv invoice.Invoice)
 	return nil
 }
 
+func (i *InvoiceRepoStub) UpdateInvoice(ctx context.Context, inv *invoice.Invoice) error {
+	for j, invoices := range i.invoices {
+		if invoices.ID == inv.ID {
+			i.invoices[j] = inv
+			return nil
+		}
+	}
+	return errors.New("failed to update invoice in database")
+}
+
 func TestNewService(t *testing.T) {
 	irStub := InvoiceRepoStub{}
 	svc, err := invoice.NewService(&irStub)
@@ -43,6 +55,7 @@ func TestNewService(t *testing.T) {
 }
 
 func TestService(t *testing.T) {
+	fmt.Println("hello")
 	irStub := InvoiceRepoStub{}
 	svc, _ := invoice.NewService(&irStub)
 	ctx := context.Background()
@@ -88,7 +101,7 @@ func TestService(t *testing.T) {
 			}
 		}
 	})
-	t.Run("Store saves an invoiceRequests as an invoice to the repository", func(t *testing.T) {
+	t.Run("NewInvoice saves an invoiceRequests as an invoice to the repository", func(t *testing.T) {
 		clearInvoices(t, &irStub)
 		invRq := createInvoiceRequest(t)
 		inv, err := svc.NewInvoice(ctx, invRq)
@@ -100,89 +113,24 @@ func TestService(t *testing.T) {
 			t.Fatal("Returned invoice is nil")
 		}
 
-		testParams := []struct {
-			reqParam any
-			invParam any
-			error    string
-		}{{
-			reqParam: invRq.Description,
-			invParam: inv.Description,
-			error:    "Descriptions do not match",
-		}, {
-			reqParam: invRq.PaymentTerms,
-			invParam: inv.PaymentTerms,
-			error:    "PaymentTerms do not match",
-		}, {
-			reqParam: invRq.ClientName,
-			invParam: inv.Client.ClientName,
-			error:    "ClientNames do not match",
-		}, {
-			reqParam: invRq.ClientEmail,
-			invParam: inv.Client.ClientEmail,
-			error:    "ClientEmails do not match",
-		}, {
-			reqParam: invRq.Status,
-			invParam: inv.Status,
-			error:    "Statuses do not match",
-		}, {
-			reqParam: invRq.PaymentDue,
-			invParam: inv.PaymentDue,
-			error:    "PaymentDue do not match",
-		}, {
-			reqParam: invRq.ClientAddress.Street,
-			invParam: inv.ClientAddress.Street,
-			error:    "ClientAddress Street do not match",
-		}, {
-			reqParam: invRq.ClientAddress.City,
-			invParam: inv.ClientAddress.City,
-			error:    "ClientAddress City do not match",
-		}, {
-			reqParam: invRq.ClientAddress.PostCode,
-			invParam: inv.ClientAddress.PostCode,
-			error:    "ClientAddress PostCode do not match",
-		}, {
-			reqParam: invRq.ClientAddress.Country,
-			invParam: inv.ClientAddress.Country,
-			error:    "ClientAddress Country do not match",
-		}, {
-			reqParam: invRq.SenderAddress.Street,
-			invParam: inv.SenderAddress.Street,
-			error:    "SenderAddress Street do not match",
-		}, {
-			reqParam: invRq.SenderAddress.City,
-			invParam: inv.SenderAddress.City,
-			error:    "SenderAddress City do not match",
-		}, {
-			reqParam: invRq.SenderAddress.PostCode,
-			invParam: inv.SenderAddress.PostCode,
-			error:    "SenderAddress PostCode do not match",
-		}, {
-			reqParam: invRq.SenderAddress.Country,
-			invParam: inv.SenderAddress.Country,
-			error:    "SenderAddress Country do not match",
-		},
+		checkInvoiceAgainstInvoiceRequest(t, inv, invRq)
+
+	})
+	t.Run("UpdateInvoice saves changes to an invoice to the repository", func(t *testing.T) {
+		clearInvoices(t, &irStub)
+		id := addInvoice(t, &irStub)
+
+		invRq := createInvoiceRequest(t)
+		inv, err := svc.UpdateInvoice(ctx, id, invRq)
+
+		if err != nil {
+			t.Fatalf("Received error when none expected: %s", err.Error())
+		}
+		if inv == nil {
+			t.Fatal("Returned invoice is nil")
 		}
 
-		for _, tp := range testParams {
-			if tp.reqParam != tp.invParam {
-				t.Errorf(tp.error)
-			}
-		}
-
-		if len(invRq.Items) != len(inv.InvoiceItems) {
-			t.Errorf("Incorrect number of InvoiceItems on Invoice, received: %d expected: %d", len(inv.InvoiceItems), len(invRq.Items))
-		}
-		for i := range invRq.Items {
-			if invRq.Items[i].Name != inv.InvoiceItems[i].Item.Name {
-				t.Errorf("Items names do not match")
-			}
-			if invRq.Items[i].Price != inv.InvoiceItems[i].Item.Price {
-				t.Errorf("Items Price do not match")
-			}
-			if invRq.Items[i].Quantity != inv.InvoiceItems[i].Quantity {
-				t.Errorf("Items quantity do not match")
-			}
-		}
+		checkInvoiceAgainstInvoiceRequest(t, inv, invRq)
 	})
 }
 
@@ -246,4 +194,92 @@ func createInvoiceRequest(t testing.TB) invoice.InvoiceRequest {
 	}
 
 	return invRq
+}
+
+func checkInvoiceAgainstInvoiceRequest(t testing.TB, inv *invoice.Invoice, invRq invoice.InvoiceRequest) {
+
+	testParams := []struct {
+		reqParam any
+		invParam any
+		error    string
+	}{{
+		reqParam: invRq.Description,
+		invParam: inv.Description,
+		error:    "Descriptions do not match",
+	}, {
+		reqParam: invRq.PaymentTerms,
+		invParam: inv.PaymentTerms,
+		error:    "PaymentTerms do not match",
+	}, {
+		reqParam: invRq.ClientName,
+		invParam: inv.Client.ClientName,
+		error:    "ClientNames do not match",
+	}, {
+		reqParam: invRq.ClientEmail,
+		invParam: inv.Client.ClientEmail,
+		error:    "ClientEmails do not match",
+	}, {
+		reqParam: invRq.Status,
+		invParam: inv.Status,
+		error:    "Statuses do not match",
+	}, {
+		reqParam: invRq.PaymentDue,
+		invParam: inv.PaymentDue,
+		error:    "PaymentDue do not match",
+	}, {
+		reqParam: invRq.ClientAddress.Street,
+		invParam: inv.ClientAddress.Street,
+		error:    "ClientAddress Street do not match",
+	}, {
+		reqParam: invRq.ClientAddress.City,
+		invParam: inv.ClientAddress.City,
+		error:    "ClientAddress City do not match",
+	}, {
+		reqParam: invRq.ClientAddress.PostCode,
+		invParam: inv.ClientAddress.PostCode,
+		error:    "ClientAddress PostCode do not match",
+	}, {
+		reqParam: invRq.ClientAddress.Country,
+		invParam: inv.ClientAddress.Country,
+		error:    "ClientAddress Country do not match",
+	}, {
+		reqParam: invRq.SenderAddress.Street,
+		invParam: inv.SenderAddress.Street,
+		error:    "SenderAddress Street do not match",
+	}, {
+		reqParam: invRq.SenderAddress.City,
+		invParam: inv.SenderAddress.City,
+		error:    "SenderAddress City do not match",
+	}, {
+		reqParam: invRq.SenderAddress.PostCode,
+		invParam: inv.SenderAddress.PostCode,
+		error:    "SenderAddress PostCode do not match",
+	}, {
+		reqParam: invRq.SenderAddress.Country,
+		invParam: inv.SenderAddress.Country,
+		error:    "SenderAddress Country do not match",
+	},
+	}
+
+	for _, tp := range testParams {
+		if tp.reqParam != tp.invParam {
+			t.Errorf(tp.error)
+		}
+	}
+
+	if len(invRq.Items) != len(inv.InvoiceItems) {
+		t.Errorf("Incorrect number of InvoiceItems on Invoice, received: %d expected: %d", len(inv.InvoiceItems), len(invRq.Items))
+	}
+	for i := range invRq.Items {
+		if invRq.Items[i].Name != inv.InvoiceItems[i].Item.Name {
+			t.Errorf("Items names do not match")
+		}
+		if invRq.Items[i].Price != inv.InvoiceItems[i].Item.Price {
+			t.Errorf("Items Price do not match")
+		}
+		if invRq.Items[i].Quantity != inv.InvoiceItems[i].Quantity {
+			t.Errorf("Items quantity do not match")
+		}
+	}
+
 }
