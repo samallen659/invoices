@@ -64,6 +64,15 @@ func (s *Service) UpdateInvoice(ctx context.Context, id uuid.UUID, invoiceReques
 	return inv, nil
 }
 
+func (s *Service) DeleteInvoice(ctx context.Context, id uuid.UUID) error {
+	err := s.repo.DeleteInvoice(ctx, id)
+	if err != nil {
+		return fmt.Errorf("failed deleting invoice: %w", err)
+	}
+
+	return nil
+}
+
 func (s *Service) setInvoice(inv *Invoice, invoiceRequest InvoiceRequest) error {
 	if err := inv.SetDescription(invoiceRequest.Description); err != nil {
 		return fmt.Errorf("failed creating invoice: %w", err)
