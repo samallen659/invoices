@@ -16,7 +16,8 @@ func NewServer(invHandler *invoice.Handler) (*Server, error) {
 	router := mux.NewRouter()
 
 	router.HandleFunc("/invoice/{id}", invHandler.HandleGetByID).Methods(http.MethodGet)
-	router.HandleFunc("/invoice/{id}", invHandler.HandleUpdate).Methods(http.MethodPost)
+	router.HandleFunc("/invoice/{id}", invHandler.HandleUpdate).Methods(http.MethodPut)
+	router.HandleFunc("/invoice/{id}", invHandler.HandleDelete).Methods(http.MethodDelete)
 	router.HandleFunc("/invoice", invHandler.HandleGetAll).Methods(http.MethodGet)
 	router.HandleFunc("/invoice", invHandler.HandleStore).Methods(http.MethodPost)
 

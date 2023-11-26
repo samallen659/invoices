@@ -119,6 +119,23 @@ func (h *Handler) HandleUpdate(w http.ResponseWriter, r *http.Request) {
 	h.writeJson(w, http.StatusOK, InvoiceResponse{Invoice: []*Invoice{inv}})
 }
 
+func (h *Handler) HandleDelete(w http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["id"]
+
+	uid, err := uuid.Parse(id)
+	if err != nil {
+		h.writeJson(w, http.StatusBadRequest, ErrorResponse{Error: err.Error()})
+		return
+	}
+
+	if err = h.svc.DeleteInvoice(r.Context(), uid); err != nil {
+		h.writeJson(w, http.StatusBadRequest, ErrorResponse{Error: err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
 func (h *Handler) writeJson(w http.ResponseWriter, status int, data any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
