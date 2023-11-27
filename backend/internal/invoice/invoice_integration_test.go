@@ -30,28 +30,10 @@ const (
 
 func TestInvoiceDomain(t *testing.T) {
 	ctx := context.Background()
-	pgContainer, err := createDBContainer(ctx)
-	if err != nil {
-		t.Errorf("Failed created DB for integration test: %s", err.Error())
-	}
 
-	connStr, err := pgContainer.ConnectionString(ctx, "sslmode=disable")
-	if err != nil {
-		t.Errorf("Failed created DB for integration test: %s", err.Error())
-	}
-	ports, err := pgContainer.Container.Ports(ctx)
-	if err != nil {
-		t.Errorf("Failed created DB for integration test: %s", err.Error())
-	}
+	connStr := setupInvoiceDB(t, ctx)
 
-	hostPort := ports["5432/tcp"][0].HostPort
-
-	err = migrateDB(ctx, hostPort)
-	if err != nil {
-		t.Errorf("Failed created DB for integration test: %s", err.Error())
-	}
-
-	invHandler, err := setupInvoiceDomain(ctx, connStr)
+	invHandler, err := setupInvoiceDomain(connStr)
 	if err != nil {
 		t.Errorf("failed setting up invoice domain for integration test: %s", err.Error())
 	}
@@ -82,7 +64,7 @@ func TestInvoiceDomain(t *testing.T) {
 
 }
 
-func setupInvoiceDomain(ctx context.Context, connStr string) (*invoice.Handler, error) {
+func setupInvoiceDomain(connStr string) (*invoice.Handler, error) {
 	repo, err := invoice.NewPostgresRespository(connStr)
 	if err != nil {
 		return nil, err
@@ -101,6 +83,33 @@ func setupInvoiceDomain(ctx context.Context, connStr string) (*invoice.Handler, 
 	return handler, nil
 }
 
+func setupInvoiceDB(t testing.TB, ctx context.Context) string {
+	t.Helper()
+
+	pgContainer, err := createDBContainer(ctx)
+	if err != nil {
+		t.Errorf("Failed created DB for integration test: %s", err.Error())
+	}
+
+	connStr, err := pgContainer.ConnectionString(ctx, "sslmode=disable")
+	if err != nil {
+		t.Errorf("Failed created DB for integration test: %s", err.Error())
+	}
+	ports, err := pgContainer.Container.Ports(ctx)
+	if err != nil {
+		t.Errorf("Failed created DB for integration test: %s", err.Error())
+	}
+
+	hostPort := ports["5432/tcp"][0].HostPort
+
+	err = migrateDB(hostPort)
+	if err != nil {
+		t.Errorf("Failed created DB for integration test: %s", err.Error())
+	}
+
+	return connStr
+}
+
 func createDBContainer(ctx context.Context) (*postgres.PostgresContainer, error) {
 	pgContainer, err := postgres.RunContainer(ctx, testcontainers.WithImage("postgres:15-alpine"),
 		postgres.WithDatabase(DB_NAME), postgres.WithUsername(DB_USER), postgres.WithPassword(DB_PASS),
@@ -115,7 +124,7 @@ func createDBContainer(ctx context.Context) (*postgres.PostgresContainer, error)
 	return pgContainer, nil
 }
 
-func migrateDB(ctx context.Context, hostPort string) error {
+func migrateDB(hostPort string) error {
 	_, path, _, ok := runtime.Caller(0)
 	if !ok {
 		return fmt.Errorf("failed to get path")
