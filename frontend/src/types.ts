@@ -9,8 +9,13 @@ type Address = {
 
 type Item = {
 	Name: string;
-	Quantity: number;
 	Price: number;
+};
+
+type InvoiceItem = {
+	Item: Item;
+	Quantity: number;
+	Total: number;
 };
 
 type Client = {
@@ -28,8 +33,8 @@ type Invoice = {
 	Status: InvoiceStatus;
 	ClientAddress: Address;
 	SenderAddress: Address;
-	Items: Item[];
+	InvoiceItems: InvoiceItem[];
 	Total: number;
 };
 
-export type { InvoiceStatus, Address, Item, Client, Invoice };
+export type { InvoiceStatus, Address, Item, InvoiceItem, Client, Invoice };
