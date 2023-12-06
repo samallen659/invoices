@@ -14,8 +14,9 @@ async function getAllInvoices(): Promise<Invoice[]> {
 		throw new Error(message);
 	}
 
-	const invoices: Invoice[] = await response.json();
-	return [...invoices];
+	const json = await response.json();
+	const invoices: Invoice[] = json?.invoice;
+	return invoices;
 }
 
 export { getAllInvoices };
