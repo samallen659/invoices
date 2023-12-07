@@ -25,8 +25,8 @@ function InvoiceListItem({ invoice }: InvoiceListItemProps) {
 				<span className="text-indigo-200">#</span>
 				{getShortID(invoice.ID)}
 			</p>
-			<p>{invoice.Client.ClientName}</p>
-			<p className="row-start-3 text-indigo-200 dark:text-gray-200 -mt-1">{getShortDate(invoice.PaymentDue)}</p>
+			<p className="text-indigo-200 dark:text-white">{invoice.Client.ClientName}</p>
+			<p className="row-start-3 -mt-1 text-indigo-200 dark:text-gray-200">{getShortDate(invoice.PaymentDue)}</p>
 			<p className="row-start-4 pt-1 font-bold">{`£${invoice.Total}`}</p>
 			<div
 				className={`col-start-2 row-span-2 row-start-3 rounded-md bg-opacity-10 font-bold ${getStatusColor(
