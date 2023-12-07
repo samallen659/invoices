@@ -12,13 +12,19 @@ function MenuBar() {
 		<div className="flex justify-between">
 			<div>
 				<h1 className="text-xl font-bold text-gray-800 dark:text-white md:text-3xl">Invoices</h1>
-				<p className="text-sm text-gray-400 dark:text-gray-200">{`${
+				<p className="hidden text-sm text-gray-400 dark:text-gray-200 md:block">{`${
 					invoiceCount == 0 ? "No invoices" : `There are ${invoiceCount} total invoices`
+				}`}</p>
+				<p className="text-sm text-gray-400 dark:text-gray-200 md:hidden">{`${
+					invoiceCount == 0 ? "No invoices" : `${invoiceCount} invoices`
 				}`}</p>
 			</div>
 			<div className="flex gap-10">
 				<Menu as="div" className="relative self-center">
-					<Menu.Button>Filter by status</Menu.Button>
+					<Menu.Button>
+						<span className="hidden md:block">Filter by Status</span>
+						<span className="md:hidden">Filter</span>
+					</Menu.Button>
 					<Menu.Items className="absolute left-0 right-0 ml-auto mt-4 h-32 w-48 translate-x-1/4 rounded-md bg-white shadow-lg">
 						<RadioGroup
 							value={status}
@@ -44,11 +50,12 @@ function MenuBar() {
 						</RadioGroup>
 					</Menu.Items>
 				</Menu>
-				<button className="flex h-[48px] w-[150px] items-center gap-4 rounded-full bg-purple-400 p-2 hover:bg-purple-600">
+				<button className="flex h-[48px] w-[90px] items-center gap-2 rounded-full bg-purple-400 p-2 hover:bg-purple-600 md:w-[150px] md:gap-4">
 					<div className="flex h-8 w-8 items-center justify-center rounded-full bg-white">
 						<PlusIcon />
 					</div>
-					<h3 className="text-sm font-bold text-white">New Invoice</h3>
+					<h3 className="hidden text-sm font-bold text-white md:block">New Invoice</h3>
+					<h3 className="text-sm font-bold text-white md:hidden">New</h3>
 				</button>
 			</div>
 		</div>
