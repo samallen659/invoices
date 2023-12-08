@@ -21,7 +21,7 @@ function App() {
 		<div className={`bg-gray-800 ${isDark ? "dark" : "light"}`}>
 			<main className="flex h-screen flex-col bg-off-white dark:bg-indigo-600 lg:flex-row">
 				<SideBar toggleIsDark={toggleIsDark} isDark={isDark} />
-				<section className="mx-auto mt-16 w-full max-w-[327px]  md:max-w-[672px] lg:max-w-2xl xl:max-w-4xl 2xl:max-w-6xl">
+				<section className="mx-auto mt-16 w-full p-6 md:max-w-[672px] md:p-0 lg:max-w-2xl xl:max-w-4xl 2xl:max-w-6xl">
 					<MenuBar />
 					<div className="mt-8 md:mt-14 lg:mt-16">{invoices && <InvoiceList invoices={invoices} />}</div>
 				</section>
