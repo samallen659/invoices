@@ -22,7 +22,7 @@ function MenuBar() {
 			<div className="flex gap-10">
 				<Menu as="div" className="relative self-center">
 					<Menu.Button>
-						<span className="hidden dark:text-white md:block">Filter by Status</span>
+						<span className="z-0 hidden dark:text-white md:block">Filter by Status</span>
 						<span className="dark:text-white md:hidden">Filter</span>
 					</Menu.Button>
 					<Menu.Items className="absolute left-0 right-0 ml-auto mt-4 h-32 w-48 translate-x-1/4 rounded-md bg-white shadow-lg">

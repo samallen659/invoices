@@ -9,7 +9,7 @@ type SideBarProps = {
 
 function SideBar({ toggleIsDark, isDark }: SideBarProps) {
 	return (
-		<div className="flex h-20 w-screen flex-row gap-5 bg-indigo-800 lg:h-screen lg:w-[103px] lg:flex-col lg:rounded-r-[20px]">
+		<div className="fixed z-50 flex h-20 w-screen flex-row gap-5 bg-indigo-800 lg:h-screen lg:w-[103px] lg:flex-col lg:rounded-r-[20px]">
 			<div className="relative h-20 w-20 flex-none rounded-r-[20px] bg-purple-400 lg:h-[103px] lg:w-[103px]">
 				<img
 					className="absolute bottom-0 left-0 right-0 top-0 z-20 m-auto h-6 w-6 lg:h-8 lg:w-8"
