@@ -34,10 +34,10 @@ function InvoiceListItem({ invoice }: InvoiceListItemProps) {
 			<p className="row-start-3 -mt-1 text-indigo-200 dark:text-gray-200 md:col-start-2 md:mt-0 md:basis-1/5 ">
 				{getShortDate(invoice.PaymentDue)}
 			</p>
-			<p className="row-start-4 pt-1 font-bold md:col-start-4 md:basis-1/5 ">{`£${invoice.Total}`}</p>
-			<div className="col-start-2 row-span-2 row-start-3 flex items-center justify-self-end md:col-start-5 md:basis-1/5 gap-5">
+			<p className="row-start-4 pt-1 font-bold md:col-start-4 md:basis-1/5 md:text-center xl:text-end">{`£${invoice.Total}`}</p>
+			<div className="col-start-2 row-span-2 row-start-3 flex items-center gap-5 justify-self-end md:col-start-5 md:basis-1/5 md:justify-end md:justify-self-end">
 				<div
-					className={`h-10 w-[104px] rounded-md bg-opacity-10 font-bold   ${getStatusColor(
+					className={`h-10 w-[104px] rounded-md bg-opacity-10 font-bold ${getStatusColor(
 						invoice.Status,
 					)} flex items-center justify-center capitalize`}
 				>
@@ -54,7 +54,7 @@ function InvoiceListItem({ invoice }: InvoiceListItemProps) {
 function IconArrowRight() {
 	return (
 		<svg width="7" height="10" xmlns="http://www.w3.org/2000/svg">
-			<path d="M1 1l4 4-4 4" stroke="#7C5DFA" stroke-width="2" fill="none" fill-rule="evenodd" />
+			<path d="M1 1l4 4-4 4" stroke="#7C5DFA" strokeWidth="2" fill="none" fillRule="evenodd" />
 		</svg>
 	);
 }
