@@ -20,16 +20,23 @@ type InvoiceListItemProps = {
 
 function InvoiceListItem({ invoice }: InvoiceListItemProps) {
 	return (
-		<li className="grid h-36 grid-cols-2 grid-rows-4 rounded-lg border-2 border-white border-opacity-0 bg-white p-6 hover:border-purple-400 dark:bg-indigo-800 dark:text-white md:h-20">
-			<p className="font-bold dark:text-white">
+		<li
+			className="grid h-36 grid-cols-2 grid-rows-4 justify-evenly rounded-lg border-2 border-white border-opacity-0 bg-white p-6 
+            hover:border-purple-400 dark:bg-indigo-800 dark:text-white md:flex md:h-20 md:items-center"
+		>
+			<p className="md:row-col-1 font-bold dark:text-white md:basis-1/5 ">
 				<span className="text-indigo-200">#</span>
 				{getShortID(invoice.ID)}
 			</p>
-			<p className="text-indigo-200 dark:text-white">{invoice.Client.ClientName}</p>
-			<p className="row-start-3 -mt-1 text-indigo-200 dark:text-gray-200">{getShortDate(invoice.PaymentDue)}</p>
-			<p className="row-start-4 pt-1 font-bold">{`£${invoice.Total}`}</p>
+			<p className="justify-self-end text-indigo-200 dark:text-white md:col-start-3 md:basis-1/5  md:justify-self-start">
+				{invoice.Client.ClientName}
+			</p>
+			<p className="row-start-3 -mt-1 text-indigo-200 dark:text-gray-200 md:col-start-2 md:mt-0 md:basis-1/5 ">
+				{getShortDate(invoice.PaymentDue)}
+			</p>
+			<p className="row-start-4 pt-1 font-bold md:col-start-4 md:basis-1/5 ">{`£${invoice.Total}`}</p>
 			<div
-				className={`col-start-2 row-span-2 row-start-3 rounded-md bg-opacity-10 font-bold ${getStatusColor(
+				className={`col-start-2 row-span-2 row-start-3 w-[104px] justify-self-end rounded-md bg-opacity-10 font-bold md:col-start-5 md:h-10 md:basis-1/5  ${getStatusColor(
 					invoice.Status,
 				)} flex items-center justify-center capitalize`}
 			>
