@@ -21,8 +21,8 @@ type InvoiceListItemProps = {
 function InvoiceListItem({ invoice }: InvoiceListItemProps) {
 	return (
 		<li
-			className="grid h-36 grid-cols-2 grid-rows-4 justify-evenly rounded-lg border-2 border-white border-opacity-0 bg-white p-6 
-            hover:border-purple-400 dark:bg-indigo-800 dark:text-white md:flex md:h-20 md:items-center"
+			className="grid h-36 cursor-pointer grid-cols-2 grid-rows-4 justify-evenly rounded-lg border-2 border-white border-opacity-0 bg-white 
+            p-6 hover:border-purple-400 dark:bg-indigo-800 dark:text-white md:flex md:h-20 md:items-center"
 		>
 			<p className="md:row-col-1 font-bold dark:text-white md:basis-1/5 ">
 				<span className="text-indigo-200">#</span>
@@ -35,14 +35,27 @@ function InvoiceListItem({ invoice }: InvoiceListItemProps) {
 				{getShortDate(invoice.PaymentDue)}
 			</p>
 			<p className="row-start-4 pt-1 font-bold md:col-start-4 md:basis-1/5 ">{`£${invoice.Total}`}</p>
-			<div
-				className={`col-start-2 row-span-2 row-start-3 w-[104px] justify-self-end rounded-md bg-opacity-10 font-bold md:col-start-5 md:h-10 md:basis-1/5  ${getStatusColor(
-					invoice.Status,
-				)} flex items-center justify-center capitalize`}
-			>
-				{invoice.Status}
+			<div className="col-start-2 row-span-2 row-start-3 flex items-center justify-self-end md:col-start-5 md:basis-1/5 gap-5">
+				<div
+					className={`h-10 w-[104px] rounded-md bg-opacity-10 font-bold   ${getStatusColor(
+						invoice.Status,
+					)} flex items-center justify-center capitalize`}
+				>
+					{invoice.Status}
+				</div>
+				<div className="hidden md:block">
+					<IconArrowRight />
+				</div>
 			</div>
 		</li>
+	);
+}
+
+function IconArrowRight() {
+	return (
+		<svg width="7" height="10" xmlns="http://www.w3.org/2000/svg">
+			<path d="M1 1l4 4-4 4" stroke="#7C5DFA" stroke-width="2" fill="none" fill-rule="evenodd" />
+		</svg>
 	);
 }
 
