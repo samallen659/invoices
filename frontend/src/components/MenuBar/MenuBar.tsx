@@ -11,7 +11,7 @@ function MenuBar() {
 	return (
 		<div className="flex justify-between">
 			<div>
-				<h1 className="text-xl font-bold text-gray-800 dark:text-white md:text-3xl">Invoices</h1>
+				<h1 className="text-2xl font-bold text-gray-800 dark:text-white md:text-3xl">Invoices</h1>
 				<p className="hidden text-sm text-gray-400 dark:text-gray-200 md:block">{`${
 					invoiceCount == 0 ? "No invoices" : `There are ${invoiceCount} total invoices`
 				}`}</p>
@@ -23,7 +23,7 @@ function MenuBar() {
 				<Menu as="div" className="relative self-center">
 					<Menu.Button>
 						<span className="z-0 hidden dark:text-white md:block">Filter by Status</span>
-						<span className="dark:text-white md:hidden">Filter</span>
+						<span className="text-xl dark:text-white md:hidden">Filter</span>
 					</Menu.Button>
 					<Menu.Items className="absolute left-0 right-0 ml-auto mt-4 h-32 w-48 translate-x-1/4 rounded-md bg-white shadow-lg">
 						<RadioGroup
