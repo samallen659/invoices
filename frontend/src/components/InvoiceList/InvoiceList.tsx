@@ -1,28 +1,33 @@
 import { Invoice } from "../../types";
+import { InvoiceIdx } from "../../App";
 
 type InvoiceListProps = {
 	invoices: Invoice[];
+	handleInvoiceIdxChange: (i: InvoiceIdx) => void;
 };
 
-function InvoiceList({ invoices }: InvoiceListProps) {
+function InvoiceList({ invoices, handleInvoiceIdxChange }: InvoiceListProps) {
 	return (
 		<ul className="flex flex-col gap-4">
 			{invoices.map((invoice, i) => (
-				<InvoiceListItem key={i} invoice={invoice} />
+				<InvoiceListItem key={i} invoice={invoice} idx={i} handleInvoiceIdxChange={handleInvoiceIdxChange} />
 			))}
 		</ul>
 	);
 }
 
 type InvoiceListItemProps = {
+	idx: number;
 	invoice: Invoice;
+	handleInvoiceIdxChange: (i: InvoiceIdx) => void;
 };
 
-function InvoiceListItem({ invoice }: InvoiceListItemProps) {
+function InvoiceListItem({ idx, invoice, handleInvoiceIdxChange }: InvoiceListItemProps) {
 	return (
 		<li
 			className="grid h-36 cursor-pointer grid-cols-2 grid-rows-4 justify-evenly rounded-lg border-2 border-white border-opacity-0 bg-white 
             p-6 hover:border-purple-400 dark:bg-indigo-800 dark:text-white md:flex md:h-20 md:items-center"
+			onClick={() => handleInvoiceIdxChange(idx)}
 		>
 			<p className="md:row-col-1 font-bold dark:text-white md:basis-1/5 ">
 				<span className="text-indigo-200">#</span>
