@@ -1,5 +1,6 @@
 import { InvoiceIdx } from "../../App";
 import { Invoice } from "../../types";
+import { getShortDate, getShortID } from "../../utils";
 import { InvoiceStatusBox } from "../InvoiceStatusBox/InvoiceStatusBox";
 
 type ViewInvoiceProps = {
@@ -48,7 +49,55 @@ type ViewInvoiceDetailsProps = {
 };
 
 function ViewInvoiceDetails({ invoice }: ViewInvoiceDetailsProps) {
-	return <div className="rounded-md bg-white dark:bg-indigo-800"></div>;
+	return (
+		<div className="rounded-md bg-white p-6 dark:bg-indigo-800">
+			<div className="flex flex-col gap-7">
+				<div>
+					<h2 className="font-bold">
+						<span className="text-indigo-200">#</span>
+						{/*TODO: Way to see full ID*/}
+						{getShortID(invoice.ID)}
+					</h2>
+				</div>
+				<p className="text-sm text-indigo-200 dark:text-gray-200">
+					{invoice.ClientAddress.Street}
+					<br />
+					{invoice.ClientAddress.City}
+					<br />
+					{invoice.ClientAddress.PostCode}
+					<br />
+					{invoice.ClientAddress.Country}
+				</p>
+			</div>
+			<div className="grid grid-cols-2 grid-rows-3 gap-2">
+				<div>
+					<p className="pb-2 pt-4 text-sm text-indigo-200 dark:text-gray-200">Invoice Date</p>
+					<p>{getShortDate(invoice.CreatedAt)}</p>
+				</div>
+				<div className="row-start-2">
+					<p className="pb-2 pt-4 text-sm text-indigo-200 dark:text-gray-200">PaymentDue</p>
+					<p>{getShortDate(invoice.PaymentDue)}</p>
+				</div>
+				<div className="row-start-3">
+					<p className="pb-2 pt-4 text-sm text-indigo-200 dark:text-gray-200">Sent to</p>
+					<p>{invoice.Client.ClientEmail}</p>
+				</div>
+				<div className="col-start-2 row-span-2">
+					<p className="pb-2 pt-4 text-sm text-indigo-200 dark:text-gray-200">Bill To</p>
+					<p>{invoice.Client.ClientName}</p>
+					<p className="text-sm text-indigo-200 dark:text-gray-200">
+						{invoice.SenderAddress.Street}
+						<br />
+						{invoice.SenderAddress.City}
+						<br />
+						{invoice.SenderAddress.PostCode}
+						<br />
+						{invoice.SenderAddress.Country}
+					</p>
+				</div>
+			</div>
+		</div>
+	);
 }
 
 function IconArrowLeft() {
