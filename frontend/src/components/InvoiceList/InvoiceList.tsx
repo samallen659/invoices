@@ -39,7 +39,7 @@ function InvoiceListItem({ idx, invoice, handleInvoiceIdxChange }: InvoiceListIt
 				{invoice.Client.ClientName}
 			</p>
 			<p className="row-start-3 -mt-1 text-indigo-200 dark:text-gray-200 md:col-start-2 md:mt-0 md:basis-1/5 ">
-				{getShortDate(invoice.PaymentDue)}
+				{`Due ${getShortDate(invoice.PaymentDue)}`}
 			</p>
 			<p className="row-start-4 pt-1 font-bold md:col-start-4 md:basis-1/5 md:text-center xl:text-end">{`£${invoice.Total}`}</p>
 			<div className="col-start-2 row-span-2 row-start-3 flex items-center gap-5 justify-self-end md:col-start-5 md:basis-1/5 md:justify-end md:justify-self-end">
