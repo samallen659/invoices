@@ -1,6 +1,7 @@
 import { Invoice } from "../../types";
 import { InvoiceIdx } from "../../App";
 import { InvoiceStatusBox } from "../InvoiceStatusBox/InvoiceStatusBox";
+import { getShortID, getShortDate } from "../../utils";
 
 type InvoiceListProps = {
 	invoices: Invoice[];
@@ -57,16 +58,6 @@ function IconArrowRight() {
 			<path d="M1 1l4 4-4 4" stroke="#7C5DFA" strokeWidth="2" fill="none" fillRule="evenodd" />
 		</svg>
 	);
-}
-
-function getShortID(id: string): string {
-	let short = id.split("-")[0].toUpperCase();
-	return `${short}...`;
-}
-
-function getShortDate(date: Date): string {
-	const d = new Date(date);
-	return `Due ${d.getDate()} ${d.getMonth()} ${d.getFullYear()}`;
 }
 
 export { InvoiceList, InvoiceListItem };
