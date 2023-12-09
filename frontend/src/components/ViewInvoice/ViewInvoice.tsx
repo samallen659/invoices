@@ -13,7 +13,7 @@ function ViewInvoice({ invoice, handleInvoiceIdxChange }: ViewInvoiceProps) {
 		<div className="flex flex-col gap-6">
 			<button className="flex w-24 items-center gap-5" onClick={() => handleInvoiceIdxChange(0)}>
 				<IconArrowLeft />
-				<span className="mt-1 font-bold">Go Back</span>
+				<span className="mt-1 font-bold dark:text-white">Go Back</span>
 			</button>
 			<ViewInvoiceBar status={invoice.Status} />
 			<ViewInvoiceDetails invoice={invoice} />
@@ -53,7 +53,7 @@ function ViewInvoiceDetails({ invoice }: ViewInvoiceDetailsProps) {
 		<div className="rounded-md bg-white p-6 dark:bg-indigo-800">
 			<div className="flex flex-col gap-7">
 				<div>
-					<h2 className="font-bold">
+					<h2 className="font-bold dark:text-white">
 						<span className="text-indigo-200">#</span>
 						{/*TODO: Way to see full ID*/}
 						{getShortID(invoice.ID)}
@@ -72,19 +72,19 @@ function ViewInvoiceDetails({ invoice }: ViewInvoiceDetailsProps) {
 			<div className="grid grid-cols-2 grid-rows-3 gap-2">
 				<div>
 					<p className="pb-2 pt-4 text-sm text-indigo-200 dark:text-gray-200">Invoice Date</p>
-					<p>{getShortDate(invoice.CreatedAt)}</p>
+					<p className="dark:text-white">{getShortDate(invoice.CreatedAt)}</p>
 				</div>
 				<div className="row-start-2">
 					<p className="pb-2 pt-4 text-sm text-indigo-200 dark:text-gray-200">PaymentDue</p>
-					<p>{getShortDate(invoice.PaymentDue)}</p>
+					<p className="dark:text-white">{getShortDate(invoice.PaymentDue)}</p>
 				</div>
 				<div className="row-start-3">
 					<p className="pb-2 pt-4 text-sm text-indigo-200 dark:text-gray-200">Sent to</p>
-					<p>{invoice.Client.ClientEmail}</p>
+					<p className="dark:text-white">{invoice.Client.ClientEmail}</p>
 				</div>
 				<div className="col-start-2 row-span-2">
 					<p className="pb-2 pt-4 text-sm text-indigo-200 dark:text-gray-200">Bill To</p>
-					<p>{invoice.Client.ClientName}</p>
+					<p className="dark:text-white">{invoice.Client.ClientName}</p>
 					<p className="text-sm text-indigo-200 dark:text-gray-200">
 						{invoice.SenderAddress.Street}
 						<br />
