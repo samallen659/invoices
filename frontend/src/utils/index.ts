@@ -5,7 +5,7 @@ export function getShortID(id: string): string {
 
 export function getShortDate(date: Date): string {
 	const d = new Date(date);
-	const months = {
+	const months: { [key: number]: string } = {
 		1: "Jan",
 		2: "Feb",
 		3: "Mar",
