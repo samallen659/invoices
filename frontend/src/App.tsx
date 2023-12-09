@@ -5,12 +5,13 @@ import { useQuery } from "react-query";
 import { getAllInvoices } from "./api";
 import { InvoiceList } from "./components/InvoiceList/InvoiceList";
 import { useTransition } from "react-transition-state";
+import { ViewInvoice } from "./components/ViewInvoice/ViewInvoice";
 
-export type InvoiceIdx = number | null;
+export type InvoiceIdx = number;
 
 function App() {
 	const [isDark, setIsDark] = useState(false);
-	const [invoiceIdx, setInvoiceIdx] = useState<InvoiceIdx>(null);
+	const [invoiceIdx, setInvoiceIdx] = useState<InvoiceIdx>(0);
 	const [{ status, isMounted: isViewing }, toggle] = useTransition({
 		timeout: 500,
 		mountOnEnter: true,
@@ -53,7 +54,12 @@ function App() {
 								status === "preEnter" || status === "exiting" ? "scale-75 transform opacity-0" : ""
 							}`}
 						>
-							<div className="h-screen w-full bg-red-200"></div>
+							{invoices && (
+								<ViewInvoice
+									invoice={invoices[invoiceIdx]}
+									handleInvoiceIdxChange={handleInvoiceIdxChange}
+								/>
+							)}
 						</div>
 					)}
 				</section>
