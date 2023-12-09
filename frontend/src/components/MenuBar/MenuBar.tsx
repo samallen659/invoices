@@ -25,7 +25,7 @@ function MenuBar() {
 						<span className="z-0 hidden dark:text-white md:block">Filter by Status</span>
 						<span className="text-xl dark:text-white md:hidden">Filter</span>
 					</Menu.Button>
-					<Menu.Items className="absolute left-0 right-0 ml-auto mt-4 h-32 w-48 translate-x-1/4 rounded-md bg-white shadow-lg">
+					<Menu.Items className="absolute left-0 right-0 ml-auto mt-4 h-32 w-48 translate-x-1/4 rounded-md bg-white shadow-lg dark:bg-gray-600">
 						<RadioGroup
 							value={status}
 							onChange={setStatus}
@@ -37,12 +37,14 @@ function MenuBar() {
 										<div className="group mx-auto flex gap-2">
 											<div
 												className={`h-4 w-4 rounded-sm group-hover:border-2 group-hover:border-purple-400 ${
-													checked ? "border-2 border-purple-400 bg-purple-400" : "bg-gray-200"
+													checked
+														? "border-2 border-purple-400 bg-purple-400"
+														: "bg-gray-200 dark:bg-indigo-800"
 												}`}
 											>
 												{checked && <CheckIcon className="text-white" />}
 											</div>
-											<span>{status}</span>
+											<span className="dark:text-white">{status}</span>
 										</div>
 									)}
 								</RadioGroup.Option>
