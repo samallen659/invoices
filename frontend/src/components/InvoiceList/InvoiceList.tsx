@@ -1,5 +1,6 @@
 import { Invoice } from "../../types";
 import { InvoiceIdx } from "../../App";
+import { InvoiceStatusBox } from "../InvoiceStatusBox/InvoiceStatusBox";
 
 type InvoiceListProps = {
 	invoices: Invoice[];
@@ -41,13 +42,7 @@ function InvoiceListItem({ idx, invoice, handleInvoiceIdxChange }: InvoiceListIt
 			</p>
 			<p className="row-start-4 pt-1 font-bold md:col-start-4 md:basis-1/5 md:text-center xl:text-end">{`£${invoice.Total}`}</p>
 			<div className="col-start-2 row-span-2 row-start-3 flex items-center gap-5 justify-self-end md:col-start-5 md:basis-1/5 md:justify-end md:justify-self-end">
-				<div
-					className={`h-10 w-[104px] rounded-md bg-opacity-10 font-bold ${getStatusColor(
-						invoice.Status,
-					)} flex items-center justify-center capitalize`}
-				>
-					{invoice.Status}
-				</div>
+				<InvoiceStatusBox status={invoice.Status} />
 				<div className="hidden md:block">
 					<IconArrowRight />
 				</div>
@@ -72,23 +67,6 @@ function getShortID(id: string): string {
 function getShortDate(date: Date): string {
 	const d = new Date(date);
 	return `Due ${d.getDate()} ${d.getMonth()} ${d.getFullYear()}`;
-}
-
-function getStatusColor(status: string): string {
-	let color: string;
-	switch (status) {
-		case "pending":
-			color = "bg-[#FF8F00] text-[#FF8F00]";
-			break;
-		case "paid":
-			color = "bg-[#33D69F] text-[#33D69F]";
-			break;
-		default:
-			color = "bg-[#979797] text-[#979797]";
-			break;
-	}
-
-	return color;
 }
 
 export { InvoiceList, InvoiceListItem };
