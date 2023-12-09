@@ -51,7 +51,7 @@ type ViewInvoiceDetailsProps = {
 function ViewInvoiceDetails({ invoice }: ViewInvoiceDetailsProps) {
 	return (
 		<div className="rounded-md bg-white p-6 dark:bg-indigo-800">
-			<div className="flex flex-col gap-7">
+			<div className="flex flex-col gap-7 md:flex-row md:justify-between">
 				<div>
 					<h2 className="font-bold dark:text-white">
 						<span className="text-indigo-200">#</span>
@@ -59,7 +59,7 @@ function ViewInvoiceDetails({ invoice }: ViewInvoiceDetailsProps) {
 						{getShortID(invoice.ID)}
 					</h2>
 				</div>
-				<p className="text-sm text-indigo-200 dark:text-gray-200">
+				<p className="text-sm text-indigo-200 dark:text-gray-200 md:text-end">
 					{invoice.ClientAddress.Street}
 					<br />
 					{invoice.ClientAddress.City}
@@ -69,7 +69,7 @@ function ViewInvoiceDetails({ invoice }: ViewInvoiceDetailsProps) {
 					{invoice.ClientAddress.Country}
 				</p>
 			</div>
-			<div className="grid grid-cols-2 grid-rows-3 gap-2">
+			<div className="grid grid-cols-2 grid-rows-3 gap-2 md:grid-cols-3 md:grid-rows-2">
 				<div>
 					<p className="pb-2 pt-4 text-sm text-indigo-200 dark:text-gray-200">Invoice Date</p>
 					<p className="dark:text-white">{getShortDate(invoice.CreatedAt)}</p>
@@ -78,7 +78,7 @@ function ViewInvoiceDetails({ invoice }: ViewInvoiceDetailsProps) {
 					<p className="pb-2 pt-4 text-sm text-indigo-200 dark:text-gray-200">PaymentDue</p>
 					<p className="dark:text-white">{getShortDate(invoice.PaymentDue)}</p>
 				</div>
-				<div className="row-start-3">
+				<div className="row-start-3 md:col-start-3 md:row-start-1">
 					<p className="pb-2 pt-4 text-sm text-indigo-200 dark:text-gray-200">Sent to</p>
 					<p className="dark:text-white">{invoice.Client.ClientEmail}</p>
 				</div>
