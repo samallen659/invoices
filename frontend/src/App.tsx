@@ -11,7 +11,7 @@ export type InvoiceIdx = number | null;
 function App() {
 	const [isDark, setIsDark] = useState(false);
 	const [invoiceIdx, setInvoiceIdx] = useState<InvoiceIdx>(null);
-	const [{ status, isMounted }, toggle] = useTransition({
+	const [{ status, isMounted: isViewing }, toggle] = useTransition({
 		timeout: 500,
 		mountOnEnter: true,
 		unmountOnExit: true,
@@ -20,7 +20,7 @@ function App() {
 
 	const handleInvoiceIdxChange = (i: InvoiceIdx) => {
 		setInvoiceIdx(i);
-		toggle(!isMounted);
+		toggle(!isViewing);
 	};
 
 	const toggleIsDark = () => {
@@ -37,7 +37,7 @@ function App() {
 			<main className="flex min-h-screen flex-col bg-off-white dark:bg-indigo-600 lg:flex-row">
 				<SideBar toggleIsDark={toggleIsDark} isDark={isDark} />
 				<section className="mx-auto mt-24 w-full p-6 md:mt-36 md:max-w-[672px] lg:max-w-3xl lg:p-0 lg:pl-[104px] xl:max-w-4xl 2xl:max-w-6xl">
-					{!isMounted && (
+					{!isViewing && (
 						<div>
 							<MenuBar />
 							<div className="mt-8 md:mt-14 lg:mt-16">
@@ -47,7 +47,7 @@ function App() {
 							</div>
 						</div>
 					)}
-					{isMounted && (
+					{isViewing && (
 						<div
 							className={`tarnsition duration-500 ${
 								status === "preEnter" || status === "exiting" ? "scale-75 transform opacity-0" : ""
