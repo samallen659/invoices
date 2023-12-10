@@ -1,5 +1,5 @@
 import { InvoiceIdx } from "../../App";
-import { Invoice } from "../../types";
+import { Invoice, InvoiceItem, Item } from "../../types";
 import { getShortDate, getShortID } from "../../utils";
 import { InvoiceStatusBox } from "../InvoiceStatusBox/InvoiceStatusBox";
 
@@ -94,6 +94,26 @@ function ViewInvoiceDetails({ invoice }: ViewInvoiceDetailsProps) {
 						<br />
 						{invoice.SenderAddress.Country}
 					</p>
+				</div>
+			</div>
+			<div className="mt-8 rounded-md bg-off-white dark:bg-gray-600">
+				<div className="md:grid-col-5 grid gap-4 p-6">
+					<h4 className="col-span-2 col-start-1 text-indigo-200 dark:text-gray-200">Item Name</h4>
+					<h4 className="col-start-3 text-indigo-200 dark:text-gray-200">QTY.</h4>
+					<h4 className="col-start-4 text-indigo-200 dark:text-gray-200">Price</h4>
+					<h4 className="col-start-5 text-indigo-200 dark:text-gray-200">Total</h4>
+					{invoice.InvoiceItems.map((invItem: InvoiceItem) => (
+						<>
+							<p className="col-span-2 dark:text-white">{invItem.Item.Name}</p>
+							<p className="dark:text-white">{invItem.Quantity}</p>
+							<p className="dark:text-white">{`£${invItem.Item.Price}`}</p>
+							<p className="dark:text-white">{`£${invItem.Total}`}</p>
+						</>
+					))}
+				</div>
+				<div className="flex rounded-b-md bg-[#373B53] p-6 dark:bg-gray-800">
+					<p className="hidden text-sm text-white md:block">Amount Due</p>
+					<p className=" text-sm text-white md:hidden">Grand Total</p>
 				</div>
 			</div>
 		</div>
