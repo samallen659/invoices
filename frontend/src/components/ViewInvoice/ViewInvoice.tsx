@@ -111,9 +111,10 @@ function ViewInvoiceDetails({ invoice }: ViewInvoiceDetailsProps) {
 						</>
 					))}
 				</div>
-				<div className="flex rounded-b-md bg-[#373B53] p-6 dark:bg-gray-800">
+				<div className="flex items-center justify-between rounded-b-md bg-[#373B53] p-6 dark:bg-gray-800">
 					<p className="hidden text-sm text-white md:block">Amount Due</p>
 					<p className=" text-sm text-white md:hidden">Grand Total</p>
+					<h3 className="text-2xl font-bold text-white">{`£${invoice.Total}`}</h3>
 				</div>
 			</div>
 		</div>
