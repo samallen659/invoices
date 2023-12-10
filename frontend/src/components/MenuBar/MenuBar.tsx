@@ -4,9 +4,19 @@ import { CheckIcon } from "@heroicons/react/24/solid";
 
 type Statuses = "Draft" | "Pending" | "Paid" | "";
 
-function MenuBar() {
+type MenuBarProps = {
+	setFormState: (v: "new" | "edit") => void;
+	toggle: (t: boolean) => void;
+};
+
+function MenuBar({ setFormState, toggle }: MenuBarProps) {
 	let invoiceCount = 1;
 	const [status, setStatus] = useState<Statuses>("");
+
+	const handleClick = () => {
+		setFormState("new");
+		toggle(true);
+	};
 
 	return (
 		<div className="flex justify-between">
@@ -52,7 +62,10 @@ function MenuBar() {
 						</RadioGroup>
 					</Menu.Items>
 				</Menu>
-				<button className="flex h-[48px] w-[90px] items-center gap-2 rounded-full bg-purple-400 p-2 hover:bg-purple-600 md:w-[150px] md:gap-4">
+				<button
+					onClick={handleClick}
+					className="flex h-[48px] w-[90px] items-center gap-2 rounded-full bg-purple-400 p-2 hover:bg-purple-600 md:w-[150px] md:gap-4"
+				>
 					<div className="flex h-8 w-8 items-center justify-center rounded-full bg-white">
 						<PlusIcon />
 					</div>

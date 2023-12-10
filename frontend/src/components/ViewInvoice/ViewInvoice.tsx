@@ -1,11 +1,10 @@
-import { InvoiceIdx } from "../../App";
 import { Invoice, InvoiceItem } from "../../types";
 import { getShortDate, getShortID } from "../../utils";
 import { InvoiceStatusBox } from "../InvoiceStatusBox/InvoiceStatusBox";
 
 type ViewInvoiceProps = {
 	invoice: Invoice;
-    toggle: (f: boolean) => void;
+	toggle: (f: boolean) => void;
 };
 
 function ViewInvoice({ invoice, toggle }: ViewInvoiceProps) {
