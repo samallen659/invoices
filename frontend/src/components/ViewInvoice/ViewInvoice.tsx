@@ -1,5 +1,5 @@
 import { InvoiceIdx } from "../../App";
-import { Invoice, InvoiceItem, Item } from "../../types";
+import { Invoice, InvoiceItem } from "../../types";
 import { getShortDate, getShortID } from "../../utils";
 import { InvoiceStatusBox } from "../InvoiceStatusBox/InvoiceStatusBox";
 
@@ -10,23 +10,25 @@ type ViewInvoiceProps = {
 
 function ViewInvoice({ invoice, handleInvoiceIdxChange }: ViewInvoiceProps) {
 	return (
-		<div className="flex flex-col gap-6">
+		<div className=" flex flex-col gap-6 overflow-auto">
 			<button className="flex w-24 items-center gap-5" onClick={() => handleInvoiceIdxChange(0)}>
 				<IconArrowLeft />
 				<span className="mt-1 font-bold dark:text-white">Go Back</span>
 			</button>
-			<ViewInvoiceBar status={invoice.Status} />
+			<div className="hidden md:block">
+				<ViewInvoiceBar status={invoice.Status} />
+			</div>
 			<ViewInvoiceDetails invoice={invoice} />
 		</div>
 	);
 }
 
-type ViewInvoiceBarProps = {
+export type ViewInvoiceBarProps = {
 	status: string;
 };
-function ViewInvoiceBar({ status }: ViewInvoiceBarProps) {
+export function ViewInvoiceBar({ status }: ViewInvoiceBarProps) {
 	return (
-		<div className="absolute bottom-0 left-0 flex h-24 w-screen items-center justify-center bg-white px-8 dark:bg-indigo-800 md:relative md:h-[88px] md:w-full md:justify-between md:rounded-md">
+		<div className="fixed bottom-0 left-0 flex h-24 w-screen items-center justify-center bg-white px-8 dark:bg-indigo-800 md:relative md:h-[88px] md:w-full md:justify-between md:rounded-md">
 			<div className="hidden items-center gap-5 md:flex">
 				<p className="text-sm text-[#858BB2]">Status</p>
 				<InvoiceStatusBox status={status} />

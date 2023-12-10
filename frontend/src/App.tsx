@@ -5,7 +5,7 @@ import { useQuery } from "react-query";
 import { getAllInvoices } from "./api";
 import { InvoiceList } from "./components/InvoiceList/InvoiceList";
 import { useTransition } from "react-transition-state";
-import { ViewInvoice } from "./components/ViewInvoice/ViewInvoice";
+import { ViewInvoice, ViewInvoiceBar } from "./components/ViewInvoice/ViewInvoice";
 
 export type InvoiceIdx = number;
 
@@ -63,6 +63,11 @@ function App() {
 						</div>
 					)}
 				</section>
+				{isViewing && (
+					<div className="mt-24 md:hidden">
+						{invoices && <ViewInvoiceBar status={invoices[invoiceIdx].Status} />}
+					</div>
+				)}
 			</main>
 		</div>
 	);
