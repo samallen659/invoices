@@ -5,13 +5,13 @@ import { InvoiceStatusBox } from "../InvoiceStatusBox/InvoiceStatusBox";
 
 type ViewInvoiceProps = {
 	invoice: Invoice;
-	handleInvoiceIdxChange: (i: InvoiceIdx) => void;
+    toggle: (f: boolean) => void;
 };
 
-function ViewInvoice({ invoice, handleInvoiceIdxChange }: ViewInvoiceProps) {
+function ViewInvoice({ invoice, toggle }: ViewInvoiceProps) {
 	return (
 		<div className=" flex flex-col gap-6 overflow-auto">
-			<button className="flex w-24 items-center gap-5" onClick={() => handleInvoiceIdxChange(0)}>
+			<button className="flex w-24 items-center gap-5" onClick={() => toggle(false)}>
 				<IconArrowLeft />
 				<span className="mt-1 font-bold dark:text-white">Go Back</span>
 			</button>

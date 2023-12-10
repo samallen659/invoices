@@ -54,15 +54,11 @@ function App() {
 								status === "preEnter" || status === "exiting" ? "scale-75 transform opacity-0" : ""
 							}`}
 						>
-							{invoices && (
-								<ViewInvoice
-									invoice={invoices[invoiceIdx]}
-									handleInvoiceIdxChange={handleInvoiceIdxChange}
-								/>
-							)}
+							{invoices && <ViewInvoice invoice={invoices[invoiceIdx]} toggle={toggle} />}
 						</div>
 					)}
 				</section>
+				{/* ViewInvoiceBar fixed to bottom for small screens */}
 				{isViewing && (
 					<div className="mt-24 md:hidden">
 						{invoices && <ViewInvoiceBar status={invoices[invoiceIdx].Status} />}
