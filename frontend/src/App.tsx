@@ -75,9 +75,7 @@ function App() {
 						<div className="absolute left-0 top-0 h-full w-full bg-gray-800 opacity-30 "></div>
 						<div
 							className={`absolute h-full w-full bg-white transition duration-500 md:w-2/3 lg:w-1/2 ${
-								formStatus === "preEnter" || formStatus === "exiting"
-									? "-translate-x-full md:-translate-x-2/3 lg:-translate-x-1/2"
-									: ""
+								formStatus === "preEnter" || formStatus === "exiting" ? "-translate-x-full" : ""
 							}`}
 						>
 							<InvoiceForm
