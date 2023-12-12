@@ -9,14 +9,12 @@ type ViewInvoiceProps = {
 
 function ViewInvoice({ invoice, toggle }: ViewInvoiceProps) {
 	return (
-		<div className=" flex flex-col gap-6 overflow-auto">
+		<div className=" mb-20 flex flex-col gap-6 overflow-auto md:mb-6">
 			<button className="flex w-24 items-center gap-5" onClick={() => toggle(false)}>
 				<IconArrowLeft />
 				<span className="mt-1 font-bold dark:text-white">Go Back</span>
 			</button>
-			<div className="hidden md:block">
-				<ViewInvoiceBar status={invoice.Status} />
-			</div>
+			<ViewInvoiceBar status={invoice.Status} />
 			<ViewInvoiceDetails invoice={invoice} />
 		</div>
 	);

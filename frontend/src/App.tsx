@@ -6,6 +6,7 @@ import { getAllInvoices } from "./api";
 import { InvoiceList } from "./components/InvoiceList/InvoiceList";
 import { useTransition } from "react-transition-state";
 import { ViewInvoice, ViewInvoiceBar } from "./components/ViewInvoice/ViewInvoice";
+import { InvoiceForm } from "./components/InvoiceForm/InvoiceForm";
 
 export type InvoiceIdx = number;
 
@@ -69,21 +70,21 @@ function App() {
 						</div>
 					)}
 				</section>
-				{/* ViewInvoiceBar fixed to bottom for small screens */}
-				{isViewing && (
-					<div className="mt-24 md:hidden">
-						{invoices && <ViewInvoiceBar status={invoices[invoiceIdx].Status} />}
-					</div>
-				)}
 				{isForm && (
 					<>
-						<div className="left-0 top-0 hidden h-full w-full bg-gray-800 opacity-30 md:absolute md:block"></div>
+						<div className="absolute left-0 top-0 h-full w-full bg-gray-800 opacity-30 "></div>
 						<div
-							className={`absolute h-full w-1/2 bg-white transition duration-500 ${
-								formStatus === "preEnter" || formStatus === "exiting" ? "-translate-x-1/2" : ""
+							className={`absolute h-full w-full bg-white transition duration-500 md:w-2/3 lg:w-1/2 ${
+								formStatus === "preEnter" || formStatus === "exiting"
+									? "-translate-x-full md:-translate-x-2/3 lg:-translate-x-1/2"
+									: ""
 							}`}
 						>
-							<InvoiceForm state={formState} invoice={invoices[invoiceIdx]} />
+							<InvoiceForm
+								state={formState}
+								invoice={invoices != undefined && formState === "edit" ? invoices[invoiceIdx] : null}
+								toggle={formToggle}
+							/>
 						</div>
 					</>
 				)}
