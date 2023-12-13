@@ -1,4 +1,4 @@
-import { Invoice, InvoiceItem } from "../../types";
+import { Invoice, Item } from "../../types";
 import { getShortDate, getShortID } from "../../utils";
 import { InvoiceStatusBox } from "../InvoiceStatusBox/InvoiceStatusBox";
 
@@ -79,11 +79,11 @@ function ViewInvoiceDetails({ invoice }: ViewInvoiceDetailsProps) {
 				</div>
 				<div className="row-start-3 md:col-start-3 md:row-start-1">
 					<p className="pb-2 pt-4 text-sm text-indigo-200 dark:text-gray-200">Sent to</p>
-					<p className="dark:text-white">{invoice.Client.ClientEmail}</p>
+					<p className="dark:text-white">{invoice.ClientEmail}</p>
 				</div>
 				<div className="col-start-2 row-span-2">
 					<p className="pb-2 pt-4 text-sm text-indigo-200 dark:text-gray-200">Bill To</p>
-					<p className="dark:text-white">{invoice.Client.ClientName}</p>
+					<p className="dark:text-white">{invoice.ClientName}</p>
 					<p className="text-sm text-indigo-200 dark:text-gray-200">
 						{invoice.SenderAddress.Street}
 						<br />
@@ -101,12 +101,12 @@ function ViewInvoiceDetails({ invoice }: ViewInvoiceDetailsProps) {
 					<h4 className="col-start-3 text-indigo-200 dark:text-gray-200">QTY.</h4>
 					<h4 className="col-start-4 text-indigo-200 dark:text-gray-200">Price</h4>
 					<h4 className="col-start-5 text-indigo-200 dark:text-gray-200">Total</h4>
-					{invoice.InvoiceItems.map((invItem: InvoiceItem) => (
+					{invoice.Items.map((item: Item) => (
 						<>
-							<p className="col-span-2 dark:text-white">{invItem.Item.Name}</p>
-							<p className="dark:text-white">{invItem.Quantity}</p>
-							<p className="dark:text-white">{`£${invItem.Item.Price}`}</p>
-							<p className="dark:text-white">{`£${invItem.Total}`}</p>
+							<p className="col-span-2 dark:text-white">{item.Name}</p>
+							<p className="dark:text-white">{item.Quantity}</p>
+							<p className="dark:text-white">{`£${item.Price}`}</p>
+							<p className="dark:text-white">{`£${item.Total}`}</p>
 						</>
 					))}
 				</div>

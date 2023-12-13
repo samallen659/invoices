@@ -36,7 +36,7 @@ function InvoiceListItem({ idx, invoice, handleInvoiceIdxChange }: InvoiceListIt
 				{getShortID(invoice.ID)}
 			</p>
 			<p className="justify-self-end text-indigo-200 dark:text-white md:col-start-3 md:basis-1/5  md:justify-self-start">
-				{invoice.Client.ClientName}
+				{invoice.ClientName}
 			</p>
 			<p className="row-start-3 -mt-1 text-indigo-200 dark:text-gray-200 md:col-start-2 md:mt-0 md:basis-1/5 ">
 				{`Due ${getShortDate(invoice.PaymentDue)}`}

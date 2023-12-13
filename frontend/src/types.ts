@@ -9,11 +9,18 @@ type Address = {
 
 type Item = {
 	Name: string;
+	Quantity: number;
+	Price: number;
+	Total: number;
+};
+
+type ItemReq = {
+	Name: string;
 	Price: number;
 };
 
 type InvoiceItem = {
-	Item: Item;
+	Item: ItemReq;
 	Quantity: number;
 	Total: number;
 };
@@ -29,6 +36,21 @@ type Invoice = {
 	PaymentDue: Date;
 	Description: string;
 	PaymentTerms: number;
+	ClientName: string;
+	ClientEmail: string;
+	Status: InvoiceStatus;
+	ClientAddress: Address;
+	SenderAddress: Address;
+	Items: Item[];
+	Total: number;
+};
+
+type InvoiceReq = {
+	ID: string;
+	CreatedAt: Date;
+	PaymentDue: Date;
+	Description: string;
+	PaymentTerms: number;
 	Client: Client;
 	Status: InvoiceStatus;
 	ClientAddress: Address;
@@ -37,4 +59,4 @@ type Invoice = {
 	Total: number;
 };
 
-export type { InvoiceStatus, Address, Item, InvoiceItem, Client, Invoice };
+export type { InvoiceStatus, Address, Item, InvoiceItem, Client, Invoice, InvoiceReq };
