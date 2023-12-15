@@ -4,6 +4,15 @@
 @tailwind components;
 @tailwind utilities;
 
+.form-input {
+    @apply border border-gray-200 rounded-md p-4 text-gray-800 dark:bg-indigo-800 dark:border-gray-600 dark:text-white
+}
+
+.form-label {
+    @apply text-sm text-indigo-200 dark:text-gray-200
+}
+
+
 
 /* CSS Reset */
 /* Box sizing rules */
@@ -78,3 +87,4 @@ textarea:not([rows]) {
 :target {
     scroll-margin-block: 5ex;
 }
+

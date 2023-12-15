@@ -18,64 +18,120 @@ function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 	};
 
 	return (
-		<section className="mt-[80px] h-screen overflow-y-auto overscroll-contain p-8 md:p-14 lg:ml-[103px] lg:mt-0">
-			<button className="flex w-24 items-center gap-5" onClick={() => toggle(false)}>
+		<section className="mt-[80px] h-screen overflow-y-auto overflow-x-hidden overscroll-contain p-8 dark:bg-indigo-600 md:p-14 lg:ml-[103px] lg:mt-0">
+			<button className="hidden w-24 items-center gap-5 lg:flex" onClick={() => toggle(false)}>
 				<IconLeftArrow />
 				<span className="mt-1 font-bold dark:text-white">Go Back</span>
 			</button>
 			<form onSubmit={handleSubmit(onSubmit)}>
-				<div className="grid-row-3 grid-col-2 grid gap-6">
+				<h3 className="mt-10 font-bold text-purple-400">Bill From</h3>
+				<div className="mt-6 grid grid-cols-2 gap-6">
 					<div className="col-span-2 flex flex-col gap-2">
-						<label htmlFor="senderStreet">Street Address</label>
-						<input id="senderStreet" type="text" {...register("SenderAddress.Street")} />
+						<label htmlFor="senderStreet" className="form-label">
+							Street Address
+						</label>
+						<input
+							id="senderStreet"
+							type="text"
+							className="form-input"
+							{...register("SenderAddress.Street")}
+						/>
 					</div>
 					<div className="flex flex-col gap-2">
-						<label htmlFor="senderCity">City</label>
-						<input id="senderCity" type="text" {...register("SenderAddress.City")} />
+						<label htmlFor="senderCity" className="form-label">
+							City
+						</label>
+						<input id="senderCity" type="text" className="form-input" {...register("SenderAddress.City")} />
 					</div>
 					<div className="flex flex-col gap-2">
-						<label htmlFor="senderPostCode">Post Code</label>
-						<input id="senderPostCode" type="text" {...register("SenderAddress.PostCode")} />
+						<label htmlFor="senderPostCode" className="form-label">
+							Post Code
+						</label>
+						<input
+							id="senderPostCode"
+							type="text"
+							className="form-input"
+							{...register("SenderAddress.PostCode")}
+						/>
 					</div>
 					<div className="col-span-2 flex flex-col gap-2">
-						<label htmlFor="senderCountry">Country</label>
-						<input id="senderCountry" type="text" {...register("SenderAddress.Country")} />
+						<label htmlFor="senderCountry" className="form-label">
+							Country
+						</label>
+						<input
+							id="senderCountry"
+							type="text"
+							className="form-input"
+							{...register("SenderAddress.Country")}
+						/>
 					</div>
 				</div>
-				<div className="grid grid-cols-2 gap-6">
+				<h3 className="mt-10 font-bold text-purple-400">Bill To</h3>
+				<div className="mt-6 grid grid-cols-2 gap-6">
 					<div className="col-span-2 flex flex-col gap-2">
-						<label htmlFor="clientName">Client's Name</label>
-						<input id="clientName" type="text" {...register("ClientName")} />
+						<label htmlFor="clientName" className="form-label">
+							Client's Name
+						</label>
+						<input id="clientName" type="text" className="form-input" {...register("ClientName")} />
 					</div>
 					<div className="col-span-2 flex flex-col gap-2">
-						<label htmlFor="clientEmail">Client's Email</label>
-						<input id="clientEmail" type="text" {...register("ClientEmail")} />
+						<label htmlFor="clientEmail" className="form-label">
+							Client's Email
+						</label>
+						<input id="clientEmail" type="text" className="form-input" {...register("ClientEmail")} />
 					</div>
 					<div className="col-span-2 flex flex-col gap-2">
-						<label htmlFor="clientStreet">Street Address</label>
-						<input id="clientStreet" type="text" {...register("ClientAddress.Street")} />
+						<label htmlFor="clientStreet" className="form-label">
+							Street Address
+						</label>
+						<input
+							id="clientStreet"
+							type="text"
+							className="form-input"
+							{...register("ClientAddress.Street")}
+						/>
 					</div>
 					<div className="flex flex-col gap-2">
-						<label htmlFor="clientCity">City</label>
-						<input id="clientCity" type="text" {...register("ClientAddress.City")} />
+						<label htmlFor="clientCity" className="form-label">
+							City
+						</label>
+						<input id="clientCity" type="text" className="form-input" {...register("ClientAddress.City")} />
 					</div>
 					<div className="flex flex-col gap-2">
-						<label htmlFor="clientPostCode">Post Code</label>
-						<input id="clientPostCode" type="text" {...register("ClientAddress.PostCode")} />
+						<label htmlFor="clientPostCode" className="form-label">
+							Post Code
+						</label>
+						<input
+							id="clientPostCode"
+							type="text"
+							className="form-input"
+							{...register("ClientAddress.PostCode")}
+						/>
 					</div>
 					<div className="col-span-2 flex flex-col gap-2">
-						<label htmlFor="clientCountry">Country</label>
-						<input id="clientCountry" type="text" {...register("ClientAddress.Country")} />
+						<label htmlFor="clientCountry" className="form-label">
+							Country
+						</label>
+						<input
+							id="clientCountry"
+							type="text"
+							className="form-input"
+							{...register("ClientAddress.Country")}
+						/>
 					</div>
 				</div>
 				<div className="mt-2 grid gap-6">
 					<div className="flex flex-col gap-2">
-						<label htmlFor="paymentDue">Invoice Date</label>
-						<input id="paymentDue" type="date" {...register("PaymentDue")} />
+						<label htmlFor="paymentDue" className="form-label">
+							Invoice Date
+						</label>
+						<input id="paymentDue" type="date" className="form-input" {...register("PaymentDue")} />
 					</div>
 					<div className="flex flex-col gap-2">
-						<label htmlFor="paymentTerms">Payment Terms</label>
-						<select id="paymentTerms" {...register("PaymentTerms")}>
+						<label htmlFor="paymentTerms" className="form-label">
+							Payment Terms
+						</label>
+						<select id="paymentTerms" className="form-input" {...register("PaymentTerms")}>
 							<option value="1">Net 1 Day</option>
 							<option value="7">Net 7 Days</option>
 							<option value="14">Net 14 Days</option>
@@ -83,25 +139,53 @@ function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 						</select>
 					</div>
 				</div>
-				<div className="mt-6 flex flex-col gap-6">
-					<h3>Item List</h3>
+				<h3 className="my-6 text-lg font-bold text-[#777F98]">Item List</h3>
+				<div className="flex flex-col gap-6">
 					{invoice?.Items.map((item: Item, i: number) => (
 						<div className="grid grid-cols-3 gap-6">
 							<div className="col-span-3 flex flex-col gap-2">
-								<label htmlFor={`itemName${i}`}>Item Name</label>
-								<input id={`itemName${i}`} type="text" {...register(`Items.${i}.Name`)} />
+								<label htmlFor={`itemName${i}`} className="form-label">
+									Item Name
+								</label>
+								<input
+									id={`itemName${i}`}
+									type="text"
+									className="form-input"
+									{...register(`Items.${i}.Name`)}
+								/>
 							</div>
 							<div className="flex flex-col gap-2">
-								<label htmlFor={`itemQuantity${i}`}>Qty.</label>
-								<input id={`itemQuantity${i}`} type="text" {...register(`Items.${i}.Quantity`)} />
+								<label htmlFor={`itemQuantity${i}`} className="form-label">
+									Qty.
+								</label>
+								<input
+									id={`itemQuantity${i}`}
+									type="text"
+									className="form-input"
+									{...register(`Items.${i}.Quantity`)}
+								/>
 							</div>
 							<div className="flex flex-col gap-2">
-								<label htmlFor={`itemPrice${i}`}>Price</label>
-								<input id={`itemPrice${i}`} type="text" {...register(`Items.${i}.Price`)} />
+								<label htmlFor={`itemPrice${i}`} className="form-label">
+									Price
+								</label>
+								<input
+									id={`itemPrice${i}`}
+									type="text"
+									className="form-input"
+									{...register(`Items.${i}.Price`)}
+								/>
 							</div>
 							<div className="flex flex-col gap-2">
-								<label htmlFor={`itemTotal${i}`}>Total</label>
-								<input id={`itemTotal${i}`} type="text" {...register(`Items.${i}.Total`)} />
+								<label htmlFor={`itemTotal${i}`} className="form-label">
+									Total
+								</label>
+								<input
+									id={`itemTotal${i}`}
+									type="text"
+									className="form-input"
+									{...register(`Items.${i}.Total`)}
+								/>
 							</div>
 						</div>
 					))}
