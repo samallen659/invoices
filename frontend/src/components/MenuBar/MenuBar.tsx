@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef, ReactComponentElement } from "react";
-import { Menu, RadioGroup } from "@headlessui/react";
+import { useState, useEffect, useRef } from "react";
 import { CheckIcon } from "@heroicons/react/24/solid";
+import { IconUpArrow, IconDownArrow, IconPlus } from "../Icons";
 
 type Statuses = "Draft" | "Pending" | "Paid" | "";
 
@@ -51,7 +51,7 @@ function MenuBar({ setFormState, toggle }: MenuBarProps) {
 					className="flex h-[48px] w-[90px] items-center gap-2 rounded-full bg-purple-400 p-2 hover:bg-purple-600 md:w-[150px] md:gap-4"
 				>
 					<div className="flex h-8 w-8 items-center justify-center rounded-full bg-white">
-						<PlusIcon />
+						<IconPlus />
 					</div>
 					<h3 className="hidden text-sm font-bold text-white md:block">New Invoice</h3>
 					<h3 className="text-sm font-bold text-white md:hidden">New</h3>
@@ -142,34 +142,6 @@ function FilterMenu({ filter, showFilterMenu, setShowFilterMenu, handleFilterMen
 				)}
 			</div>
 		</div>
-	);
-}
-
-function IconDownArrow() {
-	return (
-		<svg width="11" height="7" xmlns="http://www.w3.org/2000/svg">
-			<path d="M1 1l4.228 4.228L9.456 1" stroke="#7C5DFA" strokeWidth="2" fill="none" fillRule="evenodd" />
-		</svg>
-	);
-}
-
-function IconUpArrow() {
-	return (
-		<svg width="11" height="7" xmlns="http://www.w3.org/2000/svg" className="rotate-180">
-			<path d="M1 1l4.228 4.228L9.456 1" stroke="#7C5DFA" strokeWidth="2" fill="none" fillRule="evenodd" />
-		</svg>
-	);
-}
-
-function PlusIcon() {
-	return (
-		<svg width="11" height="11" xmlns="http://www.w3.org/2000/svg">
-			<path
-				d="M6.313 10.023v-3.71h3.71v-2.58h-3.71V.023h-2.58v3.71H.023v2.58h3.71v3.71z"
-				fill="#7C5DFA"
-				fillRule="nonzero"
-			/>
-		</svg>
 	);
 }
 

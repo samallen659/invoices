@@ -1,6 +1,7 @@
 import { Invoice } from "../../types";
 import { useForm } from "react-hook-form";
 import { Item } from "../../types";
+import { IconLeftArrow } from "../Icons";
 
 type InvoiceFormProps = {
 	state: "new" | "edit";
@@ -19,7 +20,7 @@ function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 	return (
 		<section className="mt-[80px] h-screen overflow-y-auto overscroll-contain p-8 md:p-14 lg:ml-[103px] lg:mt-0">
 			<button className="flex w-24 items-center gap-5" onClick={() => toggle(false)}>
-				<IconArrowLeft />
+				<IconLeftArrow />
 				<span className="mt-1 font-bold dark:text-white">Go Back</span>
 			</button>
 			<form onSubmit={handleSubmit(onSubmit)}>
@@ -107,20 +108,6 @@ function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 				</div>
 			</form>
 		</section>
-	);
-}
-
-function IconArrowLeft() {
-	return (
-		<svg width="7" height="10" xmlns="http://www.w3.org/2000/svg">
-			<path
-				d="M6.342.886L2.114 5.114l4.228 4.228"
-				stroke="#9277FF"
-				strokeWidth="2"
-				fill="none"
-				fillRule="evenodd"
-			/>
-		</svg>
 	);
 }
 
