@@ -2,8 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import { CheckIcon } from "@heroicons/react/24/solid";
 import { IconUpArrow, IconDownArrow, IconPlus } from "../Icons";
 
-type Statuses = "Draft" | "Pending" | "Paid" | "";
-
 type MenuBarProps = {
 	setFormState: (v: "new" | "edit") => void;
 	toggle: (t: boolean) => void;
@@ -11,7 +9,6 @@ type MenuBarProps = {
 
 function MenuBar({ setFormState, toggle }: MenuBarProps) {
 	let invoiceCount = 1;
-	const [status, setStatus] = useState<Statuses>("");
 	const [filter, setFilter] = useState<string>("");
 	const [showFilterMenu, setShowFilterMenu] = useState<boolean>(false);
 
