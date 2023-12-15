@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef, ReactComponentElement } from "react";
 import { Menu, RadioGroup } from "@headlessui/react";
 import { CheckIcon } from "@heroicons/react/24/solid";
 
@@ -39,54 +39,24 @@ function MenuBar({ setFormState, toggle }: MenuBarProps) {
 					invoiceCount == 0 ? "No invoices" : `${invoiceCount} invoices`
 				}`}</p>
 			</div>
-			<FilterMenu
-				filter={filter}
-				showFilterMenu={showFilterMenu}
-				setShowFilterMenu={setShowFilterMenu}
-				handleFilterMenuClick={handleFilterMenuClick}
-			/>
-			{/* <Menu as="div" className="relative self-center"> */}
-			{/* 	<Menu.Button> */}
-			{/* 		<span className="z-0 hidden dark:text-white md:block">Filter by Status</span> */}
-			{/* 		<span className="text-xl dark:text-white md:hidden">Filter</span> */}
-			{/* 	</Menu.Button> */}
-			{/* 	<Menu.Items className="absolute left-0 right-0 ml-auto mt-4 h-32 w-48 translate-x-1/4 rounded-md bg-white shadow-lg dark:bg-gray-600"> */}
-			{/* 		<RadioGroup */}
-			{/* 			value={status} */}
-			{/* 			onChange={setStatus} */}
-			{/* 			className="flex h-full w-full flex-col gap-2 p-6" */}
-			{/* 		> */}
-			{/* 			{["Draft", "Pending", "Paid"].map((status) => ( */}
-			{/* 				<RadioGroup.Option value={status} key={status}> */}
-			{/* 					{({ checked }) => ( */}
-			{/* 						<div className="group mx-auto flex gap-2"> */}
-			{/* 							<div */}
-			{/* 								className={`h-4 w-4 rounded-sm group-hover:border-2 group-hover:border-purple-400 ${ */}
-			{/* 									checked */}
-			{/* 										? "border-2 border-purple-400 bg-purple-400" */}
-			{/* 										: "bg-gray-200 dark:bg-indigo-800" */}
-			{/* 								}`} */}
-			{/* 							> */}
-			{/* 								{checked && <CheckIcon className="text-white" />} */}
-			{/* 							</div> */}
-			{/* 							<span className="dark:text-white">{status}</span> */}
-			{/* 						</div> */}
-			{/* 					)} */}
-			{/* 				</RadioGroup.Option> */}
-			{/* 			))} */}
-			{/* 		</RadioGroup> */}
-			{/* 	</Menu.Items> */}
-			{/* </Menu> */}
-			<button
-				onClick={handleClick}
-				className="flex h-[48px] w-[90px] items-center gap-2 rounded-full bg-purple-400 p-2 hover:bg-purple-600 md:w-[150px] md:gap-4"
-			>
-				<div className="flex h-8 w-8 items-center justify-center rounded-full bg-white">
-					<PlusIcon />
-				</div>
-				<h3 className="hidden text-sm font-bold text-white md:block">New Invoice</h3>
-				<h3 className="text-sm font-bold text-white md:hidden">New</h3>
-			</button>
+			<div className="flex gap-12">
+				<FilterMenu
+					filter={filter}
+					showFilterMenu={showFilterMenu}
+					setShowFilterMenu={setShowFilterMenu}
+					handleFilterMenuClick={handleFilterMenuClick}
+				/>
+				<button
+					onClick={handleClick}
+					className="flex h-[48px] w-[90px] items-center gap-2 rounded-full bg-purple-400 p-2 hover:bg-purple-600 md:w-[150px] md:gap-4"
+				>
+					<div className="flex h-8 w-8 items-center justify-center rounded-full bg-white">
+						<PlusIcon />
+					</div>
+					<h3 className="hidden text-sm font-bold text-white md:block">New Invoice</h3>
+					<h3 className="text-sm font-bold text-white md:hidden">New</h3>
+				</button>
+			</div>
 		</div>
 	);
 }
@@ -99,20 +69,52 @@ type FilterMenuProps = {
 };
 
 function FilterMenu({ filter, showFilterMenu, setShowFilterMenu, handleFilterMenuClick }: FilterMenuProps) {
+	const filterRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		const handler = (e: any) => {
+			if (filterRef) {
+				if (!filterRef.current?.contains(e.target)) {
+					setShowFilterMenu(false);
+				}
+			}
+		};
+
+		document.addEventListener("mousedown", handler);
+	});
+
 	return (
-		<div className="flex gap-10">
+		<div className="flex gap-10" ref={filterRef}>
 			<div className="relative self-center">
 				<button
-					className="z-0 hidden dark:text-white md:block"
-					onClick={() => setShowFilterMenu((prev: boolean) => !prev)}
+					className="z-0 hidden items-center gap-2 dark:text-white md:flex"
+					onClick={() => setShowFilterMenu(!showFilterMenu)}
 				>
 					Filter by Status
+					{showFilterMenu ? (
+						<div className="-mt-1">
+							<IconUpArrow />
+						</div>
+					) : (
+						<div className="-mt-1">
+							<IconDownArrow />
+						</div>
+					)}
 				</button>
 				<button
-					className="text-xl dark:text-white md:hidden"
-					onClick={() => setShowFilterMenu((prev: boolean) => !prev)}
+					className="flex items-center gap-2 text-xl dark:text-white md:hidden"
+					onClick={() => setShowFilterMenu(!showFilterMenu)}
 				>
 					Filter
+					{showFilterMenu ? (
+						<div className="-mt-1">
+							<IconUpArrow />
+						</div>
+					) : (
+						<div className="-mt-1">
+							<IconDownArrow />
+						</div>
+					)}
 				</button>
 				{showFilterMenu && (
 					<div className="absolute left-0 right-0 ml-auto mt-4 h-32 w-48 translate-x-1/4 rounded-md bg-white shadow-lg dark:bg-gray-600">
@@ -140,6 +142,22 @@ function FilterMenu({ filter, showFilterMenu, setShowFilterMenu, handleFilterMen
 				)}
 			</div>
 		</div>
+	);
+}
+
+function IconDownArrow() {
+	return (
+		<svg width="11" height="7" xmlns="http://www.w3.org/2000/svg">
+			<path d="M1 1l4.228 4.228L9.456 1" stroke="#7C5DFA" strokeWidth="2" fill="none" fillRule="evenodd" />
+		</svg>
+	);
+}
+
+function IconUpArrow() {
+	return (
+		<svg width="11" height="7" xmlns="http://www.w3.org/2000/svg" className="rotate-180">
+			<path d="M1 1l4.228 4.228L9.456 1" stroke="#7C5DFA" strokeWidth="2" fill="none" fillRule="evenodd" />
+		</svg>
 	);
 }
 
