@@ -12,10 +12,20 @@ type MenuBarProps = {
 function MenuBar({ setFormState, toggle }: MenuBarProps) {
 	let invoiceCount = 1;
 	const [status, setStatus] = useState<Statuses>("");
+	const [filter, setFilter] = useState<string>("");
+	const [showFilterMenu, setShowFilterMenu] = useState<boolean>(false);
 
 	const handleClick = () => {
 		setFormState("new");
 		toggle(true);
+	};
+
+	const handleFilterMenuClick = (s: string) => {
+		if (s === filter) {
+			setFilter("");
+			return;
+		}
+		setFilter(s);
 	};
 
 	return (
@@ -29,49 +39,105 @@ function MenuBar({ setFormState, toggle }: MenuBarProps) {
 					invoiceCount == 0 ? "No invoices" : `${invoiceCount} invoices`
 				}`}</p>
 			</div>
-			<div className="flex gap-10">
-				<Menu as="div" className="relative self-center">
-					<Menu.Button>
-						<span className="z-0 hidden dark:text-white md:block">Filter by Status</span>
-						<span className="text-xl dark:text-white md:hidden">Filter</span>
-					</Menu.Button>
-					<Menu.Items className="absolute left-0 right-0 ml-auto mt-4 h-32 w-48 translate-x-1/4 rounded-md bg-white shadow-lg dark:bg-gray-600">
-						<RadioGroup
-							value={status}
-							onChange={setStatus}
-							className="flex h-full w-full flex-col gap-2 p-6"
-						>
-							{["Draft", "Pending", "Paid"].map((status) => (
-								<RadioGroup.Option value={status} key={status}>
-									{({ checked }) => (
-										<div className="group mx-auto flex gap-2">
-											<div
-												className={`h-4 w-4 rounded-sm group-hover:border-2 group-hover:border-purple-400 ${
-													checked
-														? "border-2 border-purple-400 bg-purple-400"
-														: "bg-gray-200 dark:bg-indigo-800"
-												}`}
-											>
-												{checked && <CheckIcon className="text-white" />}
-											</div>
-											<span className="dark:text-white">{status}</span>
-										</div>
-									)}
-								</RadioGroup.Option>
-							))}
-						</RadioGroup>
-					</Menu.Items>
-				</Menu>
+			<FilterMenu
+				filter={filter}
+				showFilterMenu={showFilterMenu}
+				setShowFilterMenu={setShowFilterMenu}
+				handleFilterMenuClick={handleFilterMenuClick}
+			/>
+			{/* <Menu as="div" className="relative self-center"> */}
+			{/* 	<Menu.Button> */}
+			{/* 		<span className="z-0 hidden dark:text-white md:block">Filter by Status</span> */}
+			{/* 		<span className="text-xl dark:text-white md:hidden">Filter</span> */}
+			{/* 	</Menu.Button> */}
+			{/* 	<Menu.Items className="absolute left-0 right-0 ml-auto mt-4 h-32 w-48 translate-x-1/4 rounded-md bg-white shadow-lg dark:bg-gray-600"> */}
+			{/* 		<RadioGroup */}
+			{/* 			value={status} */}
+			{/* 			onChange={setStatus} */}
+			{/* 			className="flex h-full w-full flex-col gap-2 p-6" */}
+			{/* 		> */}
+			{/* 			{["Draft", "Pending", "Paid"].map((status) => ( */}
+			{/* 				<RadioGroup.Option value={status} key={status}> */}
+			{/* 					{({ checked }) => ( */}
+			{/* 						<div className="group mx-auto flex gap-2"> */}
+			{/* 							<div */}
+			{/* 								className={`h-4 w-4 rounded-sm group-hover:border-2 group-hover:border-purple-400 ${ */}
+			{/* 									checked */}
+			{/* 										? "border-2 border-purple-400 bg-purple-400" */}
+			{/* 										: "bg-gray-200 dark:bg-indigo-800" */}
+			{/* 								}`} */}
+			{/* 							> */}
+			{/* 								{checked && <CheckIcon className="text-white" />} */}
+			{/* 							</div> */}
+			{/* 							<span className="dark:text-white">{status}</span> */}
+			{/* 						</div> */}
+			{/* 					)} */}
+			{/* 				</RadioGroup.Option> */}
+			{/* 			))} */}
+			{/* 		</RadioGroup> */}
+			{/* 	</Menu.Items> */}
+			{/* </Menu> */}
+			<button
+				onClick={handleClick}
+				className="flex h-[48px] w-[90px] items-center gap-2 rounded-full bg-purple-400 p-2 hover:bg-purple-600 md:w-[150px] md:gap-4"
+			>
+				<div className="flex h-8 w-8 items-center justify-center rounded-full bg-white">
+					<PlusIcon />
+				</div>
+				<h3 className="hidden text-sm font-bold text-white md:block">New Invoice</h3>
+				<h3 className="text-sm font-bold text-white md:hidden">New</h3>
+			</button>
+		</div>
+	);
+}
+
+type FilterMenuProps = {
+	filter: string;
+	showFilterMenu: boolean;
+	setShowFilterMenu: (b: boolean) => void;
+	handleFilterMenuClick: (s: string) => void;
+};
+
+function FilterMenu({ filter, showFilterMenu, setShowFilterMenu, handleFilterMenuClick }: FilterMenuProps) {
+	return (
+		<div className="flex gap-10">
+			<div className="relative self-center">
 				<button
-					onClick={handleClick}
-					className="flex h-[48px] w-[90px] items-center gap-2 rounded-full bg-purple-400 p-2 hover:bg-purple-600 md:w-[150px] md:gap-4"
+					className="z-0 hidden dark:text-white md:block"
+					onClick={() => setShowFilterMenu((prev: boolean) => !prev)}
 				>
-					<div className="flex h-8 w-8 items-center justify-center rounded-full bg-white">
-						<PlusIcon />
-					</div>
-					<h3 className="hidden text-sm font-bold text-white md:block">New Invoice</h3>
-					<h3 className="text-sm font-bold text-white md:hidden">New</h3>
+					Filter by Status
 				</button>
+				<button
+					className="text-xl dark:text-white md:hidden"
+					onClick={() => setShowFilterMenu((prev: boolean) => !prev)}
+				>
+					Filter
+				</button>
+				{showFilterMenu && (
+					<div className="absolute left-0 right-0 ml-auto mt-4 h-32 w-48 translate-x-1/4 rounded-md bg-white shadow-lg dark:bg-gray-600">
+						<div className="flex h-full w-full flex-col items-start gap-2 p-6">
+							{["Draft", "Pending", "Paid"].map((status) => (
+								<div
+									className="group flex w-full gap-2"
+									onClick={() => handleFilterMenuClick(status)}
+									key={status}
+								>
+									<div
+										className={`h-4 w-4 rounded-sm group-hover:border-2 group-hover:border-purple-400 ${
+											filter === status
+												? "border-2 border-purple-400 bg-purple-400"
+												: "bg-gray-200 dark:bg-indigo-800"
+										}`}
+									>
+										{filter === status && <CheckIcon className="text-white" />}
+									</div>
+									<span className="dark:text-white">{status}</span>
+								</div>
+							))}
+						</div>
+					</div>
+				)}
 			</div>
 		</div>
 	);
