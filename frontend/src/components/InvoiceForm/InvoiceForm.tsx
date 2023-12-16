@@ -49,7 +49,7 @@ function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 	};
 
 	return (
-		<section className="relative mt-[80px] h-screen overflow-y-auto overflow-x-hidden overscroll-contain p-8 dark:bg-indigo-600 md:p-14 lg:ml-[103px] lg:mt-0">
+		<section className="relative mt-[80px] h-screen overflow-y-auto overflow-x-hidden overscroll-contain p-8 md:p-14 lg:ml-[103px] lg:mt-0">
 			<button className="hidden w-24 items-center gap-5 lg:flex" onClick={() => toggle(false)}>
 				<IconLeftArrow />
 				<span className="mt-1 font-bold dark:text-white">Go Back</span>
