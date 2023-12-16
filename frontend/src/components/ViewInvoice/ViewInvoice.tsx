@@ -4,17 +4,25 @@ import { InvoiceStatusBox } from "../InvoiceStatusBox/InvoiceStatusBox";
 
 type ViewInvoiceProps = {
 	invoice: Invoice;
-	toggle: (f: boolean) => void;
+	viewToggle: (f: boolean) => void;
+	formToggle: (f: boolean) => void;
+	setFormState: (v: "new" | "edit") => void;
 };
 
-function ViewInvoice({ invoice, toggle }: ViewInvoiceProps) {
+function ViewInvoice({ invoice, viewToggle, formToggle, setFormState }: ViewInvoiceProps) {
+	const handleEditClick = () => {
+		setFormState("edit");
+		formToggle(true);
+		viewToggle(false);
+	};
+
 	return (
 		<div className=" mb-20 flex flex-col gap-6 overflow-auto md:mb-6">
-			<button className="flex w-24 items-center gap-5" onClick={() => toggle(false)}>
+			<button className="flex w-24 items-center gap-5" onClick={() => viewToggle(false)}>
 				<IconArrowLeft />
 				<span className="mt-1 font-bold dark:text-white">Go Back</span>
 			</button>
-			<ViewInvoiceBar status={invoice.Status} />
+			<ViewInvoiceBar status={invoice.Status} editClick={handleEditClick} />
 			<ViewInvoiceDetails invoice={invoice} />
 		</div>
 	);
@@ -22,8 +30,9 @@ function ViewInvoice({ invoice, toggle }: ViewInvoiceProps) {
 
 export type ViewInvoiceBarProps = {
 	status: string;
+	editClick: () => void;
 };
-export function ViewInvoiceBar({ status }: ViewInvoiceBarProps) {
+export function ViewInvoiceBar({ status, editClick }: ViewInvoiceBarProps) {
 	return (
 		<div className="fixed bottom-0 left-0 flex h-24 w-screen items-center justify-center bg-white px-8 dark:bg-indigo-800 md:relative md:h-[88px] md:w-full md:justify-between md:rounded-md">
 			<div className="hidden items-center gap-5 md:flex">
@@ -31,7 +40,10 @@ export function ViewInvoiceBar({ status }: ViewInvoiceBarProps) {
 				<InvoiceStatusBox status={status} />
 			</div>
 			<div className="flex justify-center gap-2">
-				<button className="h-12 w-[73px] rounded-full bg-[#F9FAFE] text-indigo-200 dark:bg-gray-600 dark:text-gray-200">
+				<button
+					onClick={editClick}
+					className="h-12 w-[73px] rounded-full bg-[#F9FAFE] text-indigo-200 dark:bg-gray-600 dark:text-gray-200"
+				>
 					Edit
 				</button>
 				<button className="h-12 w-[89px] rounded-full bg-red-400 text-white">Delete</button>
