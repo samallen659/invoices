@@ -18,7 +18,7 @@ function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 	};
 
 	return (
-		<section className="mt-[80px] h-screen overflow-y-auto overflow-x-hidden overscroll-contain p-8 dark:bg-indigo-600 md:p-14 lg:ml-[103px] lg:mt-0">
+		<section className="relative mt-[80px] h-screen overflow-y-auto overflow-x-hidden overscroll-contain p-8 dark:bg-indigo-600 md:p-14 lg:ml-[103px] lg:mt-0">
 			<button className="hidden w-24 items-center gap-5 lg:flex" onClick={() => toggle(false)}>
 				<IconLeftArrow />
 				<span className="mt-1 font-bold dark:text-white">Go Back</span>
@@ -191,7 +191,58 @@ function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 					))}
 				</div>
 			</form>
+			<div className="flex h-[91px] w-full items-center justify-end gap-2 p-6">
+				{state === "edit" ? (
+					<>
+						<CancelButton text={"Cancel"} onClick={() => console.log("Cancel edit")} />
+						<SaveButton text={"Save Changes"} onClick={() => console.log("Save Changes edit")} />
+					</>
+				) : (
+					<>
+						<CancelButton text={"Discard"} onClick={() => console.log("Discard new")} />
+						<button
+							className="flex h-12 items-center justify-center rounded-full bg-[#373B53] p-4 text-gray-400 dark:text-gray-200"
+							onClick={() => console.log("Save as Draft new")}
+						>
+							Save as Draft
+						</button>
+						<SaveButton text={"Save & Send"} onClick={() => console.log("Save & Send new")} />
+					</>
+				)}
+			</div>
 		</section>
+	);
+}
+
+type SaveButtonProps = {
+	text: string;
+	onClick: () => void;
+};
+
+function SaveButton({ text, onClick }: SaveButtonProps) {
+	return (
+		<button
+			className="flex h-12 items-center justify-center rounded-full bg-purple-400 p-4 text-white"
+			onClick={onClick}
+		>
+			{text}
+		</button>
+	);
+}
+
+type CancelButtonProps = {
+	text: string;
+	onClick: () => void;
+};
+
+function CancelButton({ text, onClick }: CancelButtonProps) {
+	return (
+		<button
+			className="flex h-12 items-center justify-center rounded-full bg-[#F9FAFE] p-4 text-center text-indigo-200 dark:bg-gray-600 dark:text-gray-200"
+			onClick={onClick}
+		>
+			{text}
+		</button>
 	);
 }
 
