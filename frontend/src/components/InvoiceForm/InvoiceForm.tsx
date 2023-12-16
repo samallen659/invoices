@@ -1,7 +1,7 @@
 import { Invoice } from "../../types";
 import { useForm } from "react-hook-form";
 import { Item } from "../../types";
-import { IconLeftArrow } from "../Icons";
+import { IconLeftArrow, IconPlus } from "../Icons";
 
 type InvoiceFormProps = {
 	state: "new" | "edit";
@@ -10,11 +10,34 @@ type InvoiceFormProps = {
 };
 
 function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
-	const form = invoice ? useForm({ defaultValues: invoice }) : useForm<Invoice>();
+	const inv = invoice
+		? invoice
+		: ({
+				ID: "",
+				Description: "",
+				PaymentDue: new Date(),
+				PaymentTerms: 0,
+				ClientName: "",
+				ClientEmail: "",
+				Status: "draft",
+				ClientAddress: { Street: "", City: "", PostCode: "", Country: "" },
+				SenderAddress: { Street: "", City: "", PostCode: "", Country: "" },
+				Items: [],
+				Total: 0,
+		  } as Invoice);
+	const form = useForm({ defaultValues: inv });
 	const { register, handleSubmit } = form;
+	const items = form.watch("Items");
 
 	const onSubmit = (data: Invoice) => {
 		console.log("Form Submitted", data);
+	};
+
+	const handleAddItem = () => {
+		let items = form.getValues("Items");
+		let item = { Name: "", Quantity: 0, Price: 0, Total: 0 } as Item;
+		items.push(item);
+		form.setValue("Items", items);
 	};
 
 	return (
@@ -141,7 +164,7 @@ function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 				</div>
 				<h3 className="my-6 text-lg font-bold text-[#777F98]">Item List</h3>
 				<div className="flex flex-col gap-6">
-					{invoice?.Items.map((item: Item, i: number) => (
+					{items?.map((item: Item, i: number) => (
 						<div className="grid grid-cols-3 gap-6">
 							<div className="col-span-3 flex flex-col gap-2">
 								<label htmlFor={`itemName${i}`} className="form-label">
@@ -189,27 +212,33 @@ function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 							</div>
 						</div>
 					))}
+					<button
+						className="flex h-12 items-center justify-center gap-2 rounded-full bg-[#F9FAFE] text-[#979797] dark:bg-gray-600"
+						onClick={handleAddItem}
+					>
+						<IconPlus /> <span className="-mb-1">Add New Item</span>
+					</button>
+				</div>
+				<div className="flex h-[91px] w-full items-center justify-end gap-2 p-6">
+					{state === "edit" ? (
+						<>
+							<CancelButton text={"Cancel"} onClick={() => console.log("Cancel edit")} />
+							<SaveButton text={"Save Changes"} onClick={() => console.log("Save Changes edit")} />
+						</>
+					) : (
+						<>
+							<CancelButton text={"Discard"} onClick={() => console.log("Discard new")} />
+							<button
+								className="flex h-12 items-center justify-center rounded-full bg-[#373B53] p-4 text-gray-400 dark:text-gray-200"
+								onClick={() => console.log("Save as Draft new")}
+							>
+								Save as Draft
+							</button>
+							<SaveButton text={"Save & Send"} onClick={() => console.log("Save & Send new")} />
+						</>
+					)}
 				</div>
 			</form>
-			<div className="flex h-[91px] w-full items-center justify-end gap-2 p-6">
-				{state === "edit" ? (
-					<>
-						<CancelButton text={"Cancel"} onClick={() => console.log("Cancel edit")} />
-						<SaveButton text={"Save Changes"} onClick={() => console.log("Save Changes edit")} />
-					</>
-				) : (
-					<>
-						<CancelButton text={"Discard"} onClick={() => console.log("Discard new")} />
-						<button
-							className="flex h-12 items-center justify-center rounded-full bg-[#373B53] p-4 text-gray-400 dark:text-gray-200"
-							onClick={() => console.log("Save as Draft new")}
-						>
-							Save as Draft
-						</button>
-						<SaveButton text={"Save & Send"} onClick={() => console.log("Save & Send new")} />
-					</>
-				)}
-			</div>
 		</section>
 	);
 }
