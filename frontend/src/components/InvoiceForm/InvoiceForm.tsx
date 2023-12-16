@@ -29,8 +29,16 @@ function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 	const { register, handleSubmit } = form;
 	const items = form.watch("Items");
 
-	const onSubmit = (data: Invoice) => {
-		console.log("Form Submitted", data);
+	const onSaveSubmit = (data: Invoice) => {
+		console.log("Invoice Submitted", data);
+	};
+
+	const onEditSubmit = (data: Invoice) => {
+		console.log("Invoice Edited", data);
+	};
+
+	const onDraftSubmit = (data: Invoice) => {
+		console.log("Invoice Draft", data);
 	};
 
 	const handleAddItem = () => {
@@ -46,7 +54,7 @@ function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 				<IconLeftArrow />
 				<span className="mt-1 font-bold dark:text-white">Go Back</span>
 			</button>
-			<form onSubmit={handleSubmit(onSubmit)}>
+			<form>
 				<h3 className="mt-10 font-bold text-purple-400">Bill From</h3>
 				<div className="mt-6 grid grid-cols-2 gap-6">
 					<div className="col-span-2 flex flex-col gap-2">
@@ -215,6 +223,7 @@ function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 					<button
 						className="flex h-12 items-center justify-center gap-2 rounded-full bg-[#F9FAFE] text-[#979797] dark:bg-gray-600"
 						onClick={handleAddItem}
+						type="button"
 					>
 						<IconPlus /> <span className="-mb-1">Add New Item</span>
 					</button>
@@ -223,18 +232,18 @@ function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 					{state === "edit" ? (
 						<>
 							<CancelButton text={"Cancel"} onClick={() => console.log("Cancel edit")} />
-							<SaveButton text={"Save Changes"} onClick={() => console.log("Save Changes edit")} />
+							<SaveButton text={"Save Changes"} onClick={handleSubmit(onEditSubmit)} />
 						</>
 					) : (
 						<>
 							<CancelButton text={"Discard"} onClick={() => console.log("Discard new")} />
 							<button
 								className="flex h-12 items-center justify-center rounded-full bg-[#373B53] p-4 text-gray-400 dark:text-gray-200"
-								onClick={() => console.log("Save as Draft new")}
+								onClick={handleSubmit(onDraftSubmit)}
 							>
 								Save as Draft
 							</button>
-							<SaveButton text={"Save & Send"} onClick={() => console.log("Save & Send new")} />
+							<SaveButton text={"Save & Send"} onClick={handleSubmit(onSaveSubmit)} />
 						</>
 					)}
 				</div>
