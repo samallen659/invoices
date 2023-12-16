@@ -164,7 +164,7 @@ function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 				</div>
 				<h3 className="my-6 text-lg font-bold text-[#777F98]">Item List</h3>
 				<div className="flex flex-col gap-6">
-					{items?.map((item: Item, i: number) => (
+					{items?.map((_, i: number) => (
 						<div className="grid grid-cols-3 gap-6">
 							<div className="col-span-3 flex flex-col gap-2">
 								<label htmlFor={`itemName${i}`} className="form-label">
