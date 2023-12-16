@@ -32,7 +32,6 @@ type Client = {
 
 type Invoice = {
 	ID: string;
-	CreatedAt: Date;
 	PaymentDue: Date;
 	Description: string;
 	PaymentTerms: number;

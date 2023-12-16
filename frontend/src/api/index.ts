@@ -31,7 +31,6 @@ function invoiceReqToInvoice(iq: InvoiceReq): Invoice {
 	});
 	const i: Invoice = {
 		ID: iq.ID,
-		CreatedAt: iq.CreatedAt,
 		PaymentDue: iq.PaymentDue,
 		Description: iq.Description,
 		PaymentTerms: iq.PaymentTerms,
