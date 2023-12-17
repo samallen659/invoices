@@ -32,6 +32,7 @@ function invoiceReqToInvoice(iq: InvoiceReq): Invoice {
 	const i: Invoice = {
 		ID: iq.ID,
 		PaymentDue: iq.PaymentDue,
+		CreatedAt: iq.CreatedAt,
 		Description: iq.Description,
 		PaymentTerms: iq.PaymentTerms,
 		ClientName: iq.Client.ClientName,
