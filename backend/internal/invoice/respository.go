@@ -321,6 +321,27 @@ func (pr *PostgresRepository) DeleteInvoice(ctx context.Context, id uuid.UUID) e
 	}
 	defer tx.Rollback()
 
+	rows, err := tx.Queryx(`DELETE FROM invoice_item WHERE invoice_id=$1 RETURNING item_id`, id)
+	if err != nil {
+		return errors.New("failed to DELETE FROM invoice_item")
+	}
+	var invoiceItemIDs []int
+	for rows.Next() {
+		var itemID int
+		err := rows.Scan(&itemID)
+		if err != nil {
+			return errors.New("failed to scan itemID")
+		}
+		invoiceItemIDs = append(invoiceItemIDs, itemID)
+	}
+
+	for _, itemID := range invoiceItemIDs {
+		_, err := tx.Exec(`DELETE FROM item WHERE id=$1`, itemID)
+		if err != nil {
+			return errors.New("failed to DELETE FROM item")
+		}
+	}
+
 	var clientID string
 	var senderAddressID string
 	var clientAddressID string
@@ -343,27 +364,6 @@ func (pr *PostgresRepository) DeleteInvoice(ctx context.Context, id uuid.UUID) e
 	_, err = tx.Exec(`DELETE FROM address WHERE id=$1`, clientAddressID)
 	if err != nil {
 		return errors.New("failed to DELETE FROM address")
-	}
-
-	rows, err := tx.Queryx(`DELETE FROM invoice_item WHERE invoice_id=$1 RETURNING item_id`, id)
-	if err != nil {
-		return errors.New("failed to DELETE FROM invoice_item")
-	}
-	var invoiceItemIDs []int
-	for rows.Next() {
-		var itemID int
-		err := rows.Scan(&itemID)
-		if err != nil {
-			return errors.New("failed to scan itemID")
-		}
-		invoiceItemIDs = append(invoiceItemIDs, itemID)
-	}
-
-	for _, itemID := range invoiceItemIDs {
-		_, err := tx.Exec(`DELETE FROM item WHERE id=$1`, itemID)
-		if err != nil {
-			return errors.New("failed to DELETE FROM item")
-		}
 	}
 
 	if err = tx.Commit(); err != nil {
