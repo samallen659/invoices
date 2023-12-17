@@ -1,6 +1,8 @@
+import { Fragment } from "react";
 import { Invoice, Item } from "../../types";
 import { getShortDate, getShortID } from "../../utils";
 import { InvoiceStatusBox } from "../InvoiceStatusBox/InvoiceStatusBox";
+import { useTransition } from "react-transition-state";
 import { IconLeftArrow } from "../Icons";
 
 type ViewInvoiceProps = {
@@ -17,14 +19,55 @@ function ViewInvoice({ invoice, viewToggle, formToggle, setFormState }: ViewInvo
 		viewToggle(false);
 	};
 
+	const [{ status: deleteStatus, isMounted: isDeleting }, deleteToggle] = useTransition({
+		timeout: 500,
+		mountOnEnter: true,
+		unmountOnExit: true,
+		preEnter: true,
+	});
+
 	return (
 		<div className=" mb-20 flex flex-col gap-6 overflow-auto md:mb-6">
 			<button className="flex w-24 items-center gap-5" onClick={() => viewToggle(false)}>
-				<IconArrowLeft />
+				<IconLeftArrow />
 				<span className="mt-1 font-bold dark:text-white">Go Back</span>
 			</button>
-			<ViewInvoiceBar status={invoice.Status} editClick={handleEditClick} />
+			<ViewInvoiceBar status={invoice.Status} editClick={handleEditClick} deleteToggle={deleteToggle} />
 			<ViewInvoiceDetails invoice={invoice} />
+			{isDeleting && (
+				<>
+					<div
+						className={`absolute left-0 top-0 z-40 h-full w-full overscroll-none bg-gray-800 opacity-30 transition duration-500`}
+					></div>
+					<div
+						className={`absolute left-1/2 top-1/2 z-50 flex h-[220px] w-[327px] -translate-x-1/2 -translate-y-1/2 flex-col gap-3 rounded-lg bg-white p-8 transition ${
+							deleteStatus === "preEnter" || deleteStatus === "exiting"
+								? "scale-75 transform opacity-0"
+								: ""
+						}`}
+					>
+						<h2 className="text-2xl font-bold text-gray-800">Confirm Deletion</h2>
+						<p className="text-sm text-gray-400">
+							Are you sure you want to delete invoice {`#${getShortID(invoice.ID)}`}? This action cannot
+							be undone.
+						</p>
+						<div className="flex justify-end gap-2">
+							<button
+								className="h-[48px] w-[91px] rounded-full bg-[#F9FAFE] text-indigo-200"
+								onClick={() => deleteToggle(false)}
+							>
+								Cancel
+							</button>
+							<button
+								className="h-[48px] w-[89px] rounded-full bg-red-400 text-white"
+								onClick={() => console.log("delete")}
+							>
+								Delete
+							</button>
+						</div>
+					</div>
+				</>
+			)}
 		</div>
 	);
 }
@@ -32,8 +75,9 @@ function ViewInvoice({ invoice, viewToggle, formToggle, setFormState }: ViewInvo
 export type ViewInvoiceBarProps = {
 	status: string;
 	editClick: () => void;
+	deleteToggle: (b: boolean) => void;
 };
-export function ViewInvoiceBar({ status, editClick }: ViewInvoiceBarProps) {
+export function ViewInvoiceBar({ status, editClick, deleteToggle }: ViewInvoiceBarProps) {
 	return (
 		<div className="fixed bottom-0 left-0 flex h-24 w-screen items-center justify-center bg-white px-8 dark:bg-indigo-800 md:relative md:h-[88px] md:w-full md:justify-between md:rounded-md">
 			<div className="hidden items-center gap-5 md:flex">
@@ -47,8 +91,14 @@ export function ViewInvoiceBar({ status, editClick }: ViewInvoiceBarProps) {
 				>
 					Edit
 				</button>
-				<button className="h-12 w-[89px] rounded-full bg-red-400 text-white">Delete</button>
-				<button className="h-12 w-[149px] rounded-full bg-purple-400 text-white md:w-[131px]">
+				<button className="h-12 w-[89px] rounded-full bg-red-400 text-white" onClick={() => deleteToggle(true)}>
+					Delete
+				</button>
+				<button
+					className={`${
+						status === "paid" && "hidden"
+					} h-12 w-[149px] rounded-full bg-purple-400 text-white md:w-[131px]`}
+				>
 					Mark as Paid
 				</button>
 			</div>
@@ -114,13 +164,13 @@ function ViewInvoiceDetails({ invoice }: ViewInvoiceDetailsProps) {
 					<h4 className="col-start-3 text-indigo-200 dark:text-gray-200">QTY.</h4>
 					<h4 className="col-start-4 text-indigo-200 dark:text-gray-200">Price</h4>
 					<h4 className="col-start-5 text-indigo-200 dark:text-gray-200">Total</h4>
-					{invoice.Items.map((item: Item) => (
-						<>
+					{invoice.Items.map((item: Item, i: number) => (
+						<Fragment key={i}>
 							<p className="col-span-2 dark:text-white">{item.Name}</p>
 							<p className="dark:text-white">{item.Quantity}</p>
 							<p className="dark:text-white">{`£${item.Price}`}</p>
 							<p className="dark:text-white">{`£${item.Total}`}</p>
-						</>
+						</Fragment>
 					))}
 				</div>
 				<div className="flex items-center justify-between rounded-b-md bg-[#373B53] p-6 dark:bg-gray-800">
