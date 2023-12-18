@@ -4,6 +4,8 @@ import { getShortDate, getShortID } from "../../utils";
 import { InvoiceStatusBox } from "../InvoiceStatusBox/InvoiceStatusBox";
 import { useTransition } from "react-transition-state";
 import { IconLeftArrow } from "../Icons";
+import { useMutation } from "react-query";
+import { deleteInvoice } from "../../api";
 
 type ViewInvoiceProps = {
 	invoice: Invoice;
@@ -25,6 +27,8 @@ function ViewInvoice({ invoice, viewToggle, formToggle, setFormState }: ViewInvo
 		unmountOnExit: true,
 		preEnter: true,
 	});
+
+	const mutation = useMutation(deleteInvoice);
 
 	return (
 		<div className=" mb-20 flex flex-col gap-6 overflow-auto md:mb-6">
@@ -60,7 +64,10 @@ function ViewInvoice({ invoice, viewToggle, formToggle, setFormState }: ViewInvo
 							</button>
 							<button
 								className="h-[48px] w-[89px] rounded-full bg-red-400 text-white"
-								onClick={() => console.log("delete")}
+								onClick={() => {
+									viewToggle(false);
+									mutation.mutate(invoice.ID);
+								}}
 							>
 								Delete
 							</button>

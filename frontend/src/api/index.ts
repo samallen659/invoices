@@ -20,6 +20,22 @@ async function getAllInvoices(): Promise<Invoice[]> {
 	return invoices;
 }
 
+async function deleteInvoice(id: string) {
+	const response = await fetch(`/invoice/${id}`, {
+		method: "DELETE",
+		headers: {
+			"Access-Control-Allow-Origin": "http://localhost:8080/invoice",
+		},
+	});
+
+	console.log(response);
+
+	if (!response.ok) {
+		const message = `An error has occured: ${response.status}`;
+		throw new Error(message);
+	}
+}
+
 function invoiceReqToInvoice(iq: InvoiceReq): Invoice {
 	const items: Item[] = iq.InvoiceItems.map((iv: InvoiceItem) => {
 		return {
@@ -57,4 +73,4 @@ function invoiceReqToInvoice(iq: InvoiceReq): Invoice {
 	return i;
 }
 
-export { getAllInvoices };
+export { getAllInvoices, deleteInvoice };
