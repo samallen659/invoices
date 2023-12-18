@@ -15,8 +15,8 @@ function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 		: ({
 				ID: "",
 				Description: "",
-				PaymentDue: new Date(),
-				CreatedAt: new Date(),
+				PaymentDue: "",
+				CreatedAt: "",
 				PaymentTerms: 0,
 				ClientName: "",
 				ClientEmail: "",
@@ -108,20 +108,20 @@ function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 					</div>
 				</div>
 				<h3 className="mt-10 font-bold text-purple-400">Bill To</h3>
-				<div className="mt-6 grid grid-cols-2 gap-6">
-					<div className="col-span-2 flex flex-col gap-2">
+				<div className="mt-6 grid grid-cols-2 gap-6 md:grid-cols-3">
+					<div className="col-span-2 flex flex-col gap-2 md:col-span-3">
 						<label htmlFor="clientName" className="form-label">
 							Client's Name
 						</label>
 						<input id="clientName" type="text" className="form-input" {...register("ClientName")} />
 					</div>
-					<div className="col-span-2 flex flex-col gap-2">
+					<div className="col-span-2 flex flex-col gap-2 md:col-span-3">
 						<label htmlFor="clientEmail" className="form-label">
 							Client's Email
 						</label>
 						<input id="clientEmail" type="text" className="form-input" {...register("ClientEmail")} />
 					</div>
-					<div className="col-span-2 flex flex-col gap-2">
+					<div className="col-span-2 flex flex-col gap-2 md:col-span-3">
 						<label htmlFor="clientStreet" className="form-label">
 							Street Address
 						</label>
@@ -132,7 +132,7 @@ function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 							{...register("ClientAddress.Street")}
 						/>
 					</div>
-					<div className="flex flex-col gap-2">
+					<div className="flex flex-col gap-2 md:col-span-1">
 						<label htmlFor="clientCity" className="form-label">
 							City
 						</label>
@@ -149,7 +149,7 @@ function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 							{...register("ClientAddress.PostCode")}
 						/>
 					</div>
-					<div className="col-span-2 flex flex-col gap-2">
+					<div className="col-span-2 flex flex-col gap-2 md:col-span-1">
 						<label htmlFor="clientCountry" className="form-label">
 							Country
 						</label>
@@ -166,12 +166,7 @@ function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 						<label htmlFor="paymentDue" className="form-label">
 							Invoice Date
 						</label>
-						<input
-							id="paymentDue"
-							type="date"
-							className="form-input"
-							{...register("PaymentDue", { valueAsDate: true })}
-						/>
+						<input id="paymentDue" type="date" className="form-input" {...register("PaymentDue")} />
 					</div>
 					<div className="flex flex-col gap-2">
 						<label htmlFor="paymentTerms" className="form-label">
@@ -183,6 +178,12 @@ function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 							<option value="14">Net 14 Days</option>
 							<option value="30">Net 30 Days</option>
 						</select>
+					</div>
+					<div className="flex flex-col gap-2">
+						<label htmlFor="description" className="form-label">
+							Project Description
+						</label>
+						<input id="description" type="text" className="form-input" {...register("Description")} />
 					</div>
 				</div>
 				<h3 className="my-6 text-lg font-bold text-[#777F98]">Item List</h3>
@@ -208,7 +209,7 @@ function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 									id={`itemQuantity${i}`}
 									type="number"
 									className="form-input"
-									{...register(`Items.${i}.Quantity`)}
+									{...register(`Items.${i}.Quantity`, { valueAsNumber: true })}
 									onChange={(e) => handleItemQuantityChange(e, i)}
 								/>
 							</div>
@@ -220,7 +221,7 @@ function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 									id={`itemPrice${i}`}
 									type="number"
 									className="form-input"
-									{...register(`Items.${i}.Price`)}
+									{...register(`Items.${i}.Price`, { valueAsNumber: true })}
 									onChange={(e) => handleItemPriceChange(e, i)}
 								/>
 							</div>
