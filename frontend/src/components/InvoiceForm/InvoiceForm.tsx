@@ -166,7 +166,12 @@ function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 						<label htmlFor="paymentDue" className="form-label">
 							Invoice Date
 						</label>
-						<input id="paymentDue" type="date" className="form-input" {...register("PaymentDue")} />
+						<input
+							id="paymentDue"
+							type="date"
+							className="form-input"
+							{...register("PaymentDue", { valueAsDate: true })}
+						/>
 					</div>
 					<div className="flex flex-col gap-2">
 						<label htmlFor="paymentTerms" className="form-label">
