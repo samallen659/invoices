@@ -1,4 +1,4 @@
-import { Invoice, InvoiceItem, InvoiceReq, Item, ItemReq } from "../types";
+import { Invoice, InvoiceItem, InvoiceReq, InvoiceRes, Item } from "../types";
 
 async function getAllInvoices(): Promise<Invoice[]> {
 	const response = await fetch("/invoice", {
@@ -15,8 +15,8 @@ async function getAllInvoices(): Promise<Invoice[]> {
 	}
 
 	const json = await response.json();
-	const invReqs: InvoiceReq[] = json?.invoice;
-	const invoices: Invoice[] = invReqs.map((iv: InvoiceReq) => invoiceReqToInvoice(iv));
+	const invReqs: InvoiceRes[] = json?.invoice;
+	const invoices: Invoice[] = invReqs.map((iv: InvoiceRes) => invoiceResToInvoice(iv));
 	return invoices;
 }
 
@@ -37,49 +37,23 @@ async function deleteInvoice(id: string) {
 }
 
 async function newInvoice(i: Invoice) {
-	const invReq = invoiceToInvoiceReq(i);
 	const response = await fetch("/invoice", {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
 			"Access-Control-Allow-Origin": "http://localhost:8080/invoice",
 		},
-		body: JSON.stringify(invReq),
+		body: JSON.stringify(i),
 	});
 
 	if (!response.ok) {
 		const message = `An error has occured: ${response.status}`;
+		console.log(message);
 		throw new Error(message);
 	}
 }
 
-function invoiceToInvoiceReq(i: Invoice): InvoiceReq {
-	const invItems: InvoiceItem[] = i.Items.map((it: Item) => {
-		return {
-			Item: { Name: it.Name, Price: it.Price } as ItemReq,
-			Quantity: it.Quantity,
-			Total: it.Total,
-		};
-	});
-
-	const iq: InvoiceReq = {
-		ID: i.ID,
-		PaymentDue: new Date(i.PaymentDue),
-		CreatedAt: new Date(i.CreatedAt),
-		Description: i.Description,
-		PaymentTerms: i.PaymentTerms,
-		Client: { ClientName: i.ClientName, ClientEmail: i.ClientEmail },
-		Status: i.Status,
-		ClientAddress: i.ClientAddress,
-		SenderAddress: i.SenderAddress,
-		InvoiceItems: invItems,
-		Total: i.Total,
-	};
-
-	return iq;
-}
-
-function invoiceReqToInvoice(iq: InvoiceReq): Invoice {
+function invoiceResToInvoice(iq: InvoiceRes): Invoice {
 	const items: Item[] = iq.InvoiceItems.map((iv: InvoiceItem) => {
 		return {
 			Name: iv.Item.Name,

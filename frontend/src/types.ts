@@ -14,13 +14,13 @@ type Item = {
 	Total: number;
 };
 
-type ItemReq = {
+type ItemRes = {
 	Name: string;
 	Price: number;
 };
 
 type InvoiceItem = {
-	Item: ItemReq;
+	Item: ItemRes;
 	Quantity: number;
 	Total: number;
 };
@@ -45,7 +45,7 @@ type Invoice = {
 	Total: number;
 };
 
-type InvoiceReq = {
+type InvoiceRes = {
 	ID: string;
 	CreatedAt: Date;
 	PaymentDue: Date;
@@ -59,4 +59,4 @@ type InvoiceReq = {
 	Total: number;
 };
 
-export type { InvoiceStatus, Address, Item, InvoiceItem, Client, Invoice, InvoiceReq, ItemReq };
+export type { InvoiceStatus, Address, Item, InvoiceItem, Client, Invoice, InvoiceRes, ItemRes };

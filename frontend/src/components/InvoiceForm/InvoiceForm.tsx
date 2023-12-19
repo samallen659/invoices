@@ -2,6 +2,8 @@ import { Invoice } from "../../types";
 import { useForm, useFieldArray } from "react-hook-form";
 import { IconDelete, IconLeftArrow, IconPlus } from "../Icons";
 import { ChangeEvent } from "react";
+import { newInvoice } from "../../api";
+import { useMutation } from "react-query";
 
 type InvoiceFormProps = {
 	state: "new" | "edit";
@@ -28,6 +30,7 @@ function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 		  } as Invoice);
 	const form = useForm({ defaultValues: inv });
 	const { register, handleSubmit, control, getValues, setValue } = form;
+	const mutation = useMutation(newInvoice);
 
 	const { fields, append, remove } = useFieldArray({
 		name: "Items",
@@ -35,26 +38,43 @@ function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 	});
 
 	const onSaveSubmit = (data: Invoice) => {
-		console.log("Invoice Submitted", data);
+		setTotal(data);
+		data.Status = "pending";
+		data.PaymentDue = `${data.PaymentDue}T00:00:00Z`;
+		mutation.mutate(data);
 	};
 
 	const onEditSubmit = (data: Invoice) => {
-		console.log("Invoice Edited", data);
+		setTotal(data);
+		mutation.mutate(data);
 	};
 
 	const onDraftSubmit = (data: Invoice) => {
-		console.log("Invoice Draft", data);
+		setTotal(data);
+		data.Status = "draft";
+		mutation.mutate(data);
+	};
+
+	const setTotal = (i: Invoice) => {
+		let total = 0;
+		for (let item of i.Items) {
+			item.Total = item.Quantity * item.Price;
+			total += item.Total;
+		}
+		i.Total = total;
 	};
 
 	const handleItemPriceChange = (e: ChangeEvent<HTMLInputElement>, i: number) => {
 		const item = getValues(`Items.${i}`);
 		const total = item.Quantity * e.target.value;
+		console.log("price change: ", total);
 		setValue(`Items.${i}.Total`, total);
 	};
 
 	const handleItemQuantityChange = (e: ChangeEvent<HTMLInputElement>, i: number) => {
 		const item = getValues(`Items.${i}`);
 		const total = e.target.value * item.Price;
+		console.log("quantity change: ", total);
 		setValue(`Items.${i}.Total`, total);
 	};
 
@@ -172,7 +192,11 @@ function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 						<label htmlFor="paymentTerms" className="form-label">
 							Payment Terms
 						</label>
-						<select id="paymentTerms" className="form-input" {...register("PaymentTerms")}>
+						<select
+							id="paymentTerms"
+							className="form-input"
+							{...register("PaymentTerms", { valueAsNumber: true })}
+						>
 							<option value="1">Net 1 Day</option>
 							<option value="7">Net 7 Days</option>
 							<option value="14">Net 14 Days</option>
