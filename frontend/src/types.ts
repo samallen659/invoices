@@ -32,8 +32,8 @@ type Client = {
 
 type Invoice = {
 	ID: string;
-	PaymentDue: string;
 	CreatedAt: string;
+	PaymentDue: string;
 	Description: string;
 	PaymentTerms: number;
 	ClientName: string;
@@ -59,4 +59,4 @@ type InvoiceReq = {
 	Total: number;
 };
 
-export type { InvoiceStatus, Address, Item, InvoiceItem, Client, Invoice, InvoiceReq };
+export type { InvoiceStatus, Address, Item, InvoiceItem, Client, Invoice, InvoiceReq, ItemReq };
