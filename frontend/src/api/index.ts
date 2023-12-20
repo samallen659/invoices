@@ -1,4 +1,4 @@
-import { Invoice, InvoiceItem, InvoiceReq, InvoiceRes, Item } from "../types";
+import { Invoice, InvoiceItem, InvoiceRes, Item } from "../types";
 
 async function getAllInvoices(): Promise<Invoice[]> {
 	const response = await fetch("/invoice", {
@@ -28,8 +28,6 @@ async function deleteInvoice(id: string) {
 		},
 	});
 
-	console.log(response);
-
 	if (!response.ok) {
 		const message = `An error has occured: ${response.status}`;
 		throw new Error(message);
@@ -48,7 +46,6 @@ async function newInvoice(i: Invoice) {
 
 	if (!response.ok) {
 		const message = `An error has occured: ${response.status}`;
-		console.log(message);
 		throw new Error(message);
 	}
 }

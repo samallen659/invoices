@@ -3,8 +3,8 @@ import { Invoice, Item } from "../../types";
 import { getShortDate, getShortID } from "../../utils";
 import { InvoiceStatusBox } from "../InvoiceStatusBox/InvoiceStatusBox";
 import { useTransition } from "react-transition-state";
-import { IconLeftArrow } from "../Icons";
-import { useMutation } from "react-query";
+import { IconLeftArrow, IconSpinning } from "../Icons";
+import { useMutation, useQueryClient } from "react-query";
 import { deleteInvoice } from "../../api";
 
 type ViewInvoiceProps = {
@@ -28,7 +28,13 @@ function ViewInvoice({ invoice, viewToggle, formToggle, setFormState }: ViewInvo
 		preEnter: true,
 	});
 
-	const mutation = useMutation(deleteInvoice);
+	const queryClient = useQueryClient();
+	const mutation = useMutation(deleteInvoice, {
+		onSuccess: () => {
+			viewToggle(false);
+			setTimeout(() => queryClient.invalidateQueries("invoices"), 750);
+		},
+	});
 
 	return (
 		<div className=" mb-20 flex flex-col gap-6 overflow-auto md:mb-6">
@@ -50,28 +56,35 @@ function ViewInvoice({ invoice, viewToggle, formToggle, setFormState }: ViewInvo
 								: ""
 						}`}
 					>
-						<h2 className="text-2xl font-bold text-gray-800">Confirm Deletion</h2>
-						<p className="text-sm text-gray-400">
-							Are you sure you want to delete invoice {`#${getShortID(invoice.ID)}`}? This action cannot
-							be undone.
-						</p>
-						<div className="flex justify-end gap-2">
-							<button
-								className="h-[48px] w-[91px] rounded-full bg-[#F9FAFE] text-indigo-200"
-								onClick={() => deleteToggle(false)}
-							>
-								Cancel
-							</button>
-							<button
-								className="h-[48px] w-[89px] rounded-full bg-red-400 text-white"
-								onClick={() => {
-									viewToggle(false);
-									mutation.mutate(invoice.ID);
-								}}
-							>
-								Delete
-							</button>
-						</div>
+						{!mutation.isLoading ? (
+							<>
+								<h2 className="text-2xl font-bold text-gray-800">Confirm Deletion</h2>
+								<p className="text-sm text-gray-400">
+									Are you sure you want to delete invoice {`#${getShortID(invoice.ID)}`}? This action
+									cannot be undone.
+								</p>
+								<div className="flex justify-end gap-2">
+									<button
+										className="h-[48px] w-[91px] rounded-full bg-[#F9FAFE] text-indigo-200"
+										onClick={() => deleteToggle(false)}
+									>
+										Cancel
+									</button>
+									<button
+										className="h-[48px] w-[89px] rounded-full bg-red-400 text-white"
+										onClick={() => {
+											mutation.mutate(invoice.ID);
+										}}
+									>
+										Delete
+									</button>
+								</div>
+							</>
+						) : (
+							<div>
+								<IconSpinning />
+							</div>
+						)}
 					</div>
 				</>
 			)}
