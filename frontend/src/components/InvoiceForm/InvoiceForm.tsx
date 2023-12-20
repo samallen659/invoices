@@ -4,12 +4,49 @@ import { IconDelete, IconLeftArrow, IconPlus, IconSpinning } from "../Icons";
 import { ChangeEvent } from "react";
 import { newInvoice } from "../../api";
 import { useMutation, useQueryClient } from "react-query";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 
 type InvoiceFormProps = {
 	state: "new" | "edit";
 	invoice: Invoice | null;
 	toggle: (f: boolean) => void;
 };
+
+const invoiceSchema = yup.object({
+	ID: yup.string(),
+	Description: yup.string().required("Description is required"),
+	PaymentDue: yup.string().required("Invoice Due is required"),
+	CreatedAt: yup.string(),
+	PaymentTerms: yup.number().min(1).required("PaymentTerms is required"),
+	ClientName: yup.string().required("Client Name is required"),
+	ClientEmail: yup.string().email("Email format is not valid").required("Client Email is required"),
+	ClientAddress: yup.object({
+		Street: yup.string().required("Client Street is required"),
+		City: yup.string().required("Client City is required"),
+		PostCode: yup.string().required("Client PostCode is required"),
+		Country: yup.string().required("Client Country is required"),
+	}),
+	SenderAddress: yup.object({
+		Street: yup.string().required("Sender Street is required"),
+		City: yup.string().required("Sender City is required"),
+		PostCode: yup.string().required("Sender PostCode is required"),
+		Country: yup.string().required("Sender Country is required"),
+	}),
+	Items: yup
+		.array()
+		.of(
+			yup.object({
+				Name: yup.string().required("Item Name is required"),
+				Price: yup.number().min(0.01).required("Item Price is required"),
+				Quantity: yup.number().min(1).required("Item Quantity is required"),
+				Total: yup.number(),
+			}),
+		)
+		.min(1)
+		.required("Items are required"),
+	Total: yup.number(),
+});
 
 function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 	const inv = invoice
@@ -28,8 +65,9 @@ function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 				Items: [],
 				Total: 0,
 		  } as Invoice);
-	const form = useForm({ defaultValues: inv });
-	const { register, handleSubmit, control, getValues, setValue } = form;
+	const form = useForm({ defaultValues: inv, resolver: yupResolver(invoiceSchema) });
+	const { register, handleSubmit, control, getValues, setValue, formState } = form;
+	const { errors } = formState;
 	const { fields, append, remove } = useFieldArray({
 		name: "Items",
 		control,
@@ -43,22 +81,25 @@ function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 		},
 	});
 
-	const onSaveSubmit = (data: Invoice) => {
+	const onSaveSubmit = (data: any) => {
 		setTotal(data);
 		data.Status = "pending";
 		data.PaymentDue = `${data.PaymentDue}T00:00:00Z`;
 		mutation.mutate(data);
+		console.log(errors);
 	};
 
-	const onEditSubmit = (data: Invoice) => {
+	const onEditSubmit = (data: any) => {
 		setTotal(data);
 		mutation.mutate(data);
+		console.log(errors);
 	};
 
-	const onDraftSubmit = (data: Invoice) => {
+	const onDraftSubmit = (data: any) => {
 		setTotal(data);
 		data.Status = "draft";
 		mutation.mutate(data);
+		console.log(errors);
 	};
 
 	const setTotal = (i: Invoice) => {
@@ -90,50 +131,66 @@ function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 						<IconLeftArrow />
 						<span className="mt-1 font-bold dark:text-white">Go Back</span>
 					</button>
-					<form>
+					<form noValidate>
 						<h3 className="mt-10 font-bold text-purple-400">Bill From</h3>
 						<div className="mt-6 grid grid-cols-2 gap-6">
 							<div className="col-span-2 flex flex-col gap-2">
-								<label htmlFor="senderStreet" className="form-label">
+								<label htmlFor="senderStreet" className="text-sm text-indigo-200 dark:text-gray-200">
 									Street Address
 								</label>
 								<input
 									id="senderStreet"
 									type="text"
-									className="form-input"
+									className={`rounded-md border  p-4 text-gray-800  dark:bg-indigo-800 dark:text-white ${
+										errors.SenderAddress?.Street
+											? "border-red-400"
+											: "border-gray-200 dark:border-gray-600"
+									}`}
 									{...register("SenderAddress.Street")}
 								/>
 							</div>
 							<div className="flex flex-col gap-2">
-								<label htmlFor="senderCity" className="form-label">
+								<label htmlFor="senderCity" className="text-sm text-indigo-200 dark:text-gray-200">
 									City
 								</label>
 								<input
 									id="senderCity"
 									type="text"
-									className="form-input"
+									className={`rounded-md border p-4 text-gray-800 dark:bg-indigo-800 dark:text-white ${
+										errors.SenderAddress?.City
+											? "border-red-400"
+											: "border-gray-200 dark:border-gray-600"
+									}`}
 									{...register("SenderAddress.City")}
 								/>
 							</div>
 							<div className="flex flex-col gap-2">
-								<label htmlFor="senderPostCode" className="form-label">
+								<label htmlFor="senderPostCode" className="text-sm text-indigo-200 dark:text-gray-200">
 									Post Code
 								</label>
 								<input
 									id="senderPostCode"
 									type="text"
-									className="form-input"
+									className={`rounded-md border  p-4 text-gray-800  dark:bg-indigo-800 dark:text-white ${
+										errors.SenderAddress?.PostCode
+											? "border-red-400"
+											: "border-gray-200 dark:border-gray-600"
+									}`}
 									{...register("SenderAddress.PostCode")}
 								/>
 							</div>
 							<div className="col-span-2 flex flex-col gap-2">
-								<label htmlFor="senderCountry" className="form-label">
+								<label htmlFor="senderCountry" className="text-sm text-indigo-200 dark:text-gray-200">
 									Country
 								</label>
 								<input
 									id="senderCountry"
 									type="text"
-									className="form-input"
+									className={`rounded-md border  p-4 text-gray-800 dark:bg-indigo-800 dark:text-white ${
+										errors.SenderAddress?.Country
+											? "border-red-400"
+											: "border-gray-200 dark:border-gray-600"
+									}`}
 									{...register("SenderAddress.Country")}
 								/>
 							</div>
@@ -141,81 +198,115 @@ function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 						<h3 className="mt-10 font-bold text-purple-400">Bill To</h3>
 						<div className="mt-6 grid grid-cols-2 gap-6 md:grid-cols-3">
 							<div className="col-span-2 flex flex-col gap-2 md:col-span-3">
-								<label htmlFor="clientName" className="form-label">
+								<label htmlFor="clientName" className="text-sm text-indigo-200 dark:text-gray-200">
 									Client's Name
 								</label>
-								<input id="clientName" type="text" className="form-input" {...register("ClientName")} />
+								<input
+									id="clientName"
+									type="text"
+									className={`rounded-md border  p-4 text-gray-800 dark:bg-indigo-800 dark:text-white ${
+										errors.ClientName ? "border-red-400" : "border-gray-200 dark:border-gray-600"
+									}`}
+									{...register("ClientName")}
+								/>
 							</div>
 							<div className="col-span-2 flex flex-col gap-2 md:col-span-3">
-								<label htmlFor="clientEmail" className="form-label">
+								<label htmlFor="clientEmail" className="text-sm text-indigo-200 dark:text-gray-200">
 									Client's Email
 								</label>
 								<input
 									id="clientEmail"
 									type="text"
-									className="form-input"
+									className={`rounded-md border p-4 text-gray-800 dark:bg-indigo-800 dark:text-white ${
+										errors.ClientEmail ? "border-red-400" : "border-gray-200 dark:border-gray-600"
+									}`}
 									{...register("ClientEmail")}
 								/>
 							</div>
 							<div className="col-span-2 flex flex-col gap-2 md:col-span-3">
-								<label htmlFor="clientStreet" className="form-label">
+								<label htmlFor="clientStreet" className="text-sm text-indigo-200 dark:text-gray-200">
 									Street Address
 								</label>
 								<input
 									id="clientStreet"
 									type="text"
-									className="form-input"
+									className={`rounded-md border  p-4 text-gray-800 dark:bg-indigo-800 dark:text-white ${
+										errors.ClientAddress?.Street
+											? "border-red-400"
+											: "border-gray-200 dark:border-gray-600"
+									}`}
 									{...register("ClientAddress.Street")}
 								/>
 							</div>
 							<div className="flex flex-col gap-2 md:col-span-1">
-								<label htmlFor="clientCity" className="form-label">
+								<label htmlFor="clientCity" className="text-sm text-indigo-200 dark:text-gray-200">
 									City
 								</label>
 								<input
 									id="clientCity"
 									type="text"
-									className="form-input"
+									className={`rounded-md border p-4 text-gray-800 dark:bg-indigo-800 dark:text-white ${
+										errors.ClientAddress?.City
+											? "border-red-400"
+											: "border-gray-200 dark:border-gray-600"
+									}`}
 									{...register("ClientAddress.City")}
 								/>
 							</div>
 							<div className="flex flex-col gap-2">
-								<label htmlFor="clientPostCode" className="form-label">
+								<label htmlFor="clientPostCode" className="text-sm text-indigo-200 dark:text-gray-200">
 									Post Code
 								</label>
 								<input
 									id="clientPostCode"
 									type="text"
-									className="form-input"
+									className={`rounded-md border p-4 text-gray-800 dark:bg-indigo-800 dark:text-white ${
+										errors.ClientAddress?.PostCode
+											? "border-red-400"
+											: "border-gray-200 dark:border-gray-600"
+									}`}
 									{...register("ClientAddress.PostCode")}
 								/>
 							</div>
 							<div className="col-span-2 flex flex-col gap-2 md:col-span-1">
-								<label htmlFor="clientCountry" className="form-label">
+								<label htmlFor="clientCountry" className="text-sm text-indigo-200 dark:text-gray-200">
 									Country
 								</label>
 								<input
 									id="clientCountry"
 									type="text"
-									className="form-input"
+									className={`rounded-md border  p-4 text-gray-800 dark:bg-indigo-800 dark:text-white ${
+										errors.ClientAddress?.Country
+											? "border-red-400"
+											: "border-gray-200 dark:border-gray-600"
+									}`}
 									{...register("ClientAddress.Country")}
 								/>
 							</div>
 						</div>
 						<div className="mt-2 grid gap-6">
 							<div className="flex flex-col gap-2">
-								<label htmlFor="paymentDue" className="form-label">
+								<label htmlFor="paymentDue" className="text-sm text-indigo-200 dark:text-gray-200">
 									Invoice Date
 								</label>
-								<input id="paymentDue" type="date" className="form-input" {...register("PaymentDue")} />
+								<input
+									id="paymentDue"
+									type="date"
+									className={`rounded-md border p-4 text-gray-800 dark:bg-indigo-800 dark:text-white ${
+										errors.PaymentDue ? "border-red-400" : "border-gray-200 dark:border-gray-600"
+									}`}
+									{...register("PaymentDue")}
+								/>
 							</div>
 							<div className="flex flex-col gap-2">
-								<label htmlFor="paymentTerms" className="form-label">
+								<label htmlFor="paymentTerms" className="text-sm text-indigo-200 dark:text-gray-200">
 									Payment Terms
 								</label>
 								<select
 									id="paymentTerms"
-									className="form-input"
+									className={`rounded-md border p-4 text-gray-800 dark:bg-indigo-800 dark:text-white ${
+										errors.PaymentTerms ? "border-red-400" : "border-gray-200 dark:border-gray-600"
+									}`}
 									{...register("PaymentTerms", { valueAsNumber: true })}
 								>
 									<option value="1">Net 1 Day</option>
@@ -225,13 +316,15 @@ function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 								</select>
 							</div>
 							<div className="flex flex-col gap-2">
-								<label htmlFor="description" className="form-label">
+								<label htmlFor="description" className="text-sm text-indigo-200 dark:text-gray-200">
 									Project Description
 								</label>
 								<input
 									id="description"
 									type="text"
-									className="form-input"
+									className={`rounded-md border p-4 text-gray-800 dark:bg-indigo-800 dark:text-white ${
+										errors.Description ? "border-red-400" : "border-gray-200 dark:border-gray-600"
+									}`}
 									{...register("Description")}
 								/>
 							</div>
@@ -241,48 +334,72 @@ function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 							{fields?.map((_, i: number) => (
 								<div className="grid grid-cols-6 justify-center gap-6" key={i}>
 									<div className="col-span-6 flex flex-col gap-2">
-										<label htmlFor={`itemName${i}`} className="form-label">
+										<label
+											htmlFor={`itemName${i}`}
+											className="text-sm text-indigo-200 dark:text-gray-200"
+										>
 											Item Name
 										</label>
 										<input
 											id={`itemName${i}`}
 											type="text"
-											className="form-input"
+											className={`rounded-md border p-4 text-gray-800 dark:bg-indigo-800 dark:text-white ${
+												errors.Items?.[i]?.Name
+													? "border-red-400"
+													: "border-gray-200 dark:border-gray-600"
+											}`}
 											{...register(`Items.${i}.Name`)}
 										/>
 									</div>
 									<div className="flex flex-col gap-2">
-										<label htmlFor={`itemQuantity${i}`} className="form-label">
+										<label
+											htmlFor={`itemQuantity${i}`}
+											className="text-sm text-indigo-200 dark:text-gray-200"
+										>
 											Qty.
 										</label>
 										<input
 											id={`itemQuantity${i}`}
 											type="number"
-											className="form-input"
+											className={`rounded-md border p-4 text-gray-800 dark:bg-indigo-800 dark:text-white ${
+												errors.Items?.[i]?.Quantity
+													? "border-red-400"
+													: "border-gray-200 dark:border-gray-600"
+											}`}
 											{...register(`Items.${i}.Quantity`, { valueAsNumber: true })}
 											onChange={(e) => handleItemQuantityChange(e, i)}
 										/>
 									</div>
 									<div className="col-span-2 flex flex-col gap-2">
-										<label htmlFor={`itemPrice${i}`} className="form-label">
+										<label
+											htmlFor={`itemPrice${i}`}
+											className="text-sm text-indigo-200 dark:text-gray-200"
+										>
 											Price
 										</label>
 										<input
 											id={`itemPrice${i}`}
 											type="number"
-											className="form-input"
+											className={`rounded-md border p-4 text-gray-800 dark:bg-indigo-800 dark:text-white ${
+												errors.Items?.[i]?.Price
+													? "border-red-400"
+													: "border-gray-200 dark:border-gray-600"
+											}`}
 											{...register(`Items.${i}.Price`, { valueAsNumber: true })}
 											onChange={(e) => handleItemPriceChange(e, i)}
 										/>
 									</div>
 									<div className="col-span-2 flex flex-col gap-2">
-										<label htmlFor={`itemTotal${i}`} className="form-label">
+										<label
+											htmlFor={`itemTotal${i}`}
+											className="text-sm text-indigo-200 dark:text-gray-200"
+										>
 											Total
 										</label>
 										<input
 											id={`itemTotal${i}`}
 											type="text"
-											className="form-input-disabled"
+											className="rounded-md p-4 text-gray-400 dark:text-gray-200"
 											{...register(`Items.${i}.Total`, {
 												disabled: true,
 											})}
