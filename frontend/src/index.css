@@ -7,9 +7,12 @@
 .form-input {
     @apply border border-gray-200 rounded-md p-4 text-gray-800 dark:bg-indigo-800 dark:border-gray-600 dark:text-white
 }
+.form-input-disabled {
+    @apply  rounded-md p-4 text-gray-400 dark:text-gray-200 
+}
 
 .form-label {
-    @apply text-sm text-indigo-200 dark:text-gray-200
+    @apply text-sm text-indigo-200 dark:text-gray-200 
 }
 
 
