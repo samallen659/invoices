@@ -3,7 +3,7 @@ export function getShortID(id: string): string {
 	return `${short}...`;
 }
 
-export function getShortDate(date: Date): string {
+export function getShortDate(date: string): string {
 	const d = new Date(date);
 	const months: { [key: number]: string } = {
 		1: "Jan",
