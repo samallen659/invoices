@@ -337,7 +337,7 @@ function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 						<h3 className="my-6 text-lg font-bold text-[#777F98]">Item List</h3>
 						<div className="flex flex-col gap-6">
 							{fields?.map((_, i: number) => (
-								<div className="grid grid-cols-6 justify-center gap-6" key={i}>
+								<div className="grid grid-cols-6 justify-center gap-2 md:gap-6" key={i}>
 									<div className="col-span-6 flex flex-col gap-2">
 										<label
 											htmlFor={`itemName${i}`}
