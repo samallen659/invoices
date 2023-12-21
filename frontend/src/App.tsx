@@ -91,15 +91,19 @@ function App() {
 					<>
 						<div className="absolute left-0 top-0 h-full w-full bg-gray-800 opacity-30 "></div>
 						<div
-							className={`absolute h-full w-full bg-white transition duration-500 dark:bg-indigo-600 md:w-2/3 xl:w-1/2 ${
+							className={`absolute h-full w-full transition duration-500 md:w-2/3 xl:w-1/2 ${
 								formStatus === "preEnter" || formStatus === "exiting" ? "-translate-x-full" : ""
 							}`}
 						>
-							<InvoiceForm
-								state={formState}
-								invoice={invoices != undefined && formState === "edit" ? invoices[invoiceIdx] : null}
-								toggle={formToggle}
-							/>
+							<div className="h-full w-full bg-white dark:bg-indigo-600">
+								<InvoiceForm
+									state={formState}
+									invoice={
+										invoices != undefined && formState === "edit" ? invoices[invoiceIdx] : null
+									}
+									toggle={formToggle}
+								/>
+							</div>
 						</div>
 					</>
 				)}
