@@ -50,6 +50,22 @@ async function newInvoice(i: Invoice) {
 	}
 }
 
+async function editInvoice(i: Invoice) {
+	const response = await fetch(`/invoice/${i.ID}`, {
+		method: "PUT",
+		headers: {
+			"Content-Type": "application/json",
+			"Access-Control-Allow-Origin": "http://localhost:8080/invoice",
+		},
+		body: JSON.stringify(i),
+	});
+
+	if (!response.ok) {
+		const message = `An error has occured: ${response.status}`;
+		throw new Error(message);
+	}
+}
+
 function invoiceResToInvoice(iq: InvoiceRes): Invoice {
 	const items: Item[] = iq.InvoiceItems.map((iv: InvoiceItem) => {
 		return {
@@ -87,4 +103,4 @@ function invoiceResToInvoice(iq: InvoiceRes): Invoice {
 	return i;
 }
 
-export { getAllInvoices, deleteInvoice, newInvoice };
+export { getAllInvoices, deleteInvoice, newInvoice, editInvoice };

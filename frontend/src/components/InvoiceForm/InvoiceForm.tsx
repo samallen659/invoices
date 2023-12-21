@@ -2,7 +2,7 @@ import { Invoice } from "../../types";
 import { useForm, useFieldArray } from "react-hook-form";
 import { IconDelete, IconLeftArrow, IconPlus, IconSpinning } from "../Icons";
 import { ChangeEvent } from "react";
-import { newInvoice } from "../../api";
+import { editInvoice, newInvoice } from "../../api";
 import { useMutation, useQueryClient } from "react-query";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -74,7 +74,13 @@ function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 	});
 
 	const queryClient = useQueryClient();
-	const mutation = useMutation(newInvoice, {
+	const newMutation = useMutation(newInvoice, {
+		onSuccess: () => {
+			queryClient.invalidateQueries("invoices");
+			toggle(false);
+		},
+	});
+	const editMutation = useMutation(editInvoice, {
 		onSuccess: () => {
 			queryClient.invalidateQueries("invoices");
 			toggle(false);
@@ -85,21 +91,19 @@ function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 		setTotal(data);
 		data.Status = "pending";
 		data.PaymentDue = `${data.PaymentDue}T00:00:00Z`;
-		mutation.mutate(data);
-		console.log(errors);
+		newMutation.mutate(data);
 	};
 
 	const onEditSubmit = (data: any) => {
 		setTotal(data);
-		mutation.mutate(data);
-		console.log(errors);
+		data.PaymentDue = `${data.PaymentDue}T00:00:00Z`;
+		editMutation.mutate(data);
 	};
 
 	const onDraftSubmit = (data: any) => {
 		setTotal(data);
 		data.Status = "draft";
-		mutation.mutate(data);
-		console.log(errors);
+		newMutation.mutate(data);
 	};
 
 	const setTotal = (i: Invoice) => {
@@ -125,7 +129,7 @@ function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 
 	return (
 		<section className="relative mt-[80px] h-screen overflow-y-auto overflow-x-hidden overscroll-contain p-8 md:p-14 lg:ml-[103px] lg:mt-0">
-			{!mutation.isLoading ? (
+			{!newMutation.isLoading ? (
 				<>
 					<button className="hidden w-24 items-center gap-5 lg:flex" onClick={() => toggle(false)}>
 						<IconLeftArrow />
