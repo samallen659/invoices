@@ -198,8 +198,10 @@ function ViewInvoiceDetails({ invoice }: ViewInvoiceDetailsProps) {
 				</div>
 			</div>
 			<div className="mt-8 rounded-md bg-off-white dark:bg-gray-600">
-				<div className="md:grid-col-5 grid gap-4 p-6">
-					<h4 className="col-span-2 col-start-1 text-indigo-200 dark:text-gray-200">Item Name</h4>
+				<div className="md:grid-col-5  hidden gap-4 p-6">
+					<h4 className="col-span-2 col-start-1 hidden text-indigo-200 dark:text-gray-200 md:block">
+						Item Name
+					</h4>
 					<h4 className="col-start-3 text-indigo-200 dark:text-gray-200">QTY.</h4>
 					<h4 className="col-start-4 text-indigo-200 dark:text-gray-200">Price</h4>
 					<h4 className="col-start-5 text-indigo-200 dark:text-gray-200">Total</h4>
@@ -210,6 +212,19 @@ function ViewInvoiceDetails({ invoice }: ViewInvoiceDetailsProps) {
 							<p className="dark:text-white">{`£${item.Price}`}</p>
 							<p className="dark:text-white">{`£${item.Total}`}</p>
 						</Fragment>
+					))}
+				</div>
+				<div className="flex flex-col gap-6 p-6 md:hidden">
+					{invoice.Items.map((item: Item, i: number) => (
+						<div className="flex items-center justify-between" key={i}>
+							<div className="flex flex-col">
+								<p className="dark:text-white">{item.Name}</p>
+								<p className="text-indigo-200 dark:text-gray-400">{`${item.Quantity} x £${item.Price}`}</p>
+							</div>
+							<div>
+								<p className="dark:text-white">{`£${item.Total}`}</p>
+							</div>
+						</div>
 					))}
 				</div>
 				<div className="flex items-center justify-between rounded-b-md bg-[#373B53] p-6 dark:bg-gray-800">
