@@ -260,18 +260,18 @@ func (pr *PostgresRepository) UpdateInvoice(ctx context.Context, invoice *Invoic
 		return errors.New("failed on UPDATE to invoice")
 	}
 
-	_, err = tx.Exec(`UPDATE client SET client_name=$1, client_email=$2 WHERE client_id=$3`, invoice.Client.ClientName, invoice.Client.ClientEmail, clientID)
+	_, err = tx.Exec(`UPDATE client SET client_name=$1, client_email=$2 WHERE id=$3`, invoice.Client.ClientName, invoice.Client.ClientEmail, clientID)
 	if err != nil {
 		return errors.New("failed on UPDATE to client")
 	}
 
-	_, err = tx.Exec(`UPDATE address SET street=$1, city=$2, post_code=$3, country=$4 WHERE address_id=$5`, invoice.SenderAddress.Street,
+	_, err = tx.Exec(`UPDATE address SET street=$1, city=$2, post_code=$3, country=$4 WHERE id=$5`, invoice.SenderAddress.Street,
 		invoice.SenderAddress.City, invoice.SenderAddress.PostCode, invoice.SenderAddress.Country, senderAddressID)
 	if err != nil {
 		return errors.New("failed on UPDATE to senderAddress")
 	}
 
-	_, err = tx.Exec(`UPDATE address SET street=$1, city=$2, post_code=$3, country=$4 WHERE address_id=$5`, invoice.ClientAddress.Street,
+	_, err = tx.Exec(`UPDATE address SET street=$1, city=$2, post_code=$3, country=$4 WHERE id=$5`, invoice.ClientAddress.Street,
 		invoice.ClientAddress.City, invoice.ClientAddress.PostCode, invoice.ClientAddress.Country, clientAddressID)
 	if err != nil {
 		return errors.New("failed on UPDATE to clientAddress")
