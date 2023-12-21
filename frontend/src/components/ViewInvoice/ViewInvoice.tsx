@@ -5,7 +5,7 @@ import { InvoiceStatusBox } from "../InvoiceStatusBox/InvoiceStatusBox";
 import { useTransition } from "react-transition-state";
 import { IconLeftArrow, IconSpinning } from "../Icons";
 import { useMutation, useQueryClient } from "react-query";
-import { deleteInvoice } from "../../api";
+import { deleteInvoice, editInvoice } from "../../api";
 
 type ViewInvoiceProps = {
 	invoice: Invoice;
@@ -29,12 +29,24 @@ function ViewInvoice({ invoice, viewToggle, formToggle, setFormState }: ViewInvo
 	});
 
 	const queryClient = useQueryClient();
-	const mutation = useMutation(deleteInvoice, {
+	const deleteMutation = useMutation(deleteInvoice, {
 		onSuccess: () => {
 			viewToggle(false);
 			setTimeout(() => queryClient.invalidateQueries("invoices"), 750);
 		},
 	});
+	const paidMutation = useMutation(editInvoice, {
+		onSuccess: () => {
+			queryClient.invalidateQueries("invoices");
+		},
+	});
+
+	const handleMarkAsPaid = () => {
+		const i = { ...invoice };
+		i.Status = "paid";
+		i.PaymentDue = `${i.PaymentDue}T00:00:00Z`;
+		paidMutation.mutate(i);
+	};
 
 	return (
 		<div className=" mb-20 flex flex-col gap-6 overflow-auto md:mb-6">
@@ -42,7 +54,12 @@ function ViewInvoice({ invoice, viewToggle, formToggle, setFormState }: ViewInvo
 				<IconLeftArrow />
 				<span className="mt-1 font-bold dark:text-white">Go Back</span>
 			</button>
-			<ViewInvoiceBar status={invoice.Status} editClick={handleEditClick} deleteToggle={deleteToggle} />
+			<ViewInvoiceBar
+				status={invoice.Status}
+				editClick={handleEditClick}
+				deleteToggle={deleteToggle}
+				handleMarkAsPaid={handleMarkAsPaid}
+			/>
 			<ViewInvoiceDetails invoice={invoice} />
 			{isDeleting && (
 				<>
@@ -56,7 +73,7 @@ function ViewInvoice({ invoice, viewToggle, formToggle, setFormState }: ViewInvo
 								: ""
 						}`}
 					>
-						{!mutation.isLoading ? (
+						{!deleteMutation.isLoading ? (
 							<>
 								<h2 className="text-2xl font-bold text-gray-800">Confirm Deletion</h2>
 								<p className="text-sm text-gray-400">
@@ -73,7 +90,7 @@ function ViewInvoice({ invoice, viewToggle, formToggle, setFormState }: ViewInvo
 									<button
 										className="h-[48px] w-[89px] rounded-full bg-red-400 text-white"
 										onClick={() => {
-											mutation.mutate(invoice.ID);
+											deleteMutation.mutate(invoice.ID);
 										}}
 									>
 										Delete
@@ -96,8 +113,9 @@ export type ViewInvoiceBarProps = {
 	status: string;
 	editClick: () => void;
 	deleteToggle: (b: boolean) => void;
+	handleMarkAsPaid: () => void;
 };
-export function ViewInvoiceBar({ status, editClick, deleteToggle }: ViewInvoiceBarProps) {
+export function ViewInvoiceBar({ status, editClick, deleteToggle, handleMarkAsPaid }: ViewInvoiceBarProps) {
 	return (
 		<div className="fixed bottom-0 left-0 flex h-24 w-screen items-center justify-center bg-white px-8 dark:bg-indigo-800 md:relative md:h-[88px] md:w-full md:justify-between md:rounded-md">
 			<div className="hidden items-center gap-5 md:flex">
@@ -118,6 +136,7 @@ export function ViewInvoiceBar({ status, editClick, deleteToggle }: ViewInvoiceB
 					className={`${
 						status === "paid" && "hidden"
 					} h-12 w-[149px] rounded-full bg-purple-400 text-white md:w-[131px]`}
+					onClick={handleMarkAsPaid}
 				>
 					Mark as Paid
 				</button>
