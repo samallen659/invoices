@@ -12,6 +12,7 @@ export type InvoiceIdx = number;
 
 function App() {
 	const [isDark, setIsDark] = useState(false);
+	const [filter, setFilter] = useState<string>("");
 
 	const [invoiceIdx, setInvoiceIdx] = useState<InvoiceIdx>(0);
 	const [{ status: viewStatus, isMounted: isViewing }, viewToggle] = useTransition({
@@ -50,10 +51,19 @@ function App() {
 				<section className="mx-auto mt-24 w-full p-6 md:mt-36 md:max-w-[672px] lg:mt-20 lg:max-w-3xl lg:p-0 lg:pl-[104px] xl:max-w-4xl 2xl:max-w-6xl">
 					{!isViewing && (
 						<div>
-							<MenuBar setFormState={setFormState} toggle={formToggle} />
+							<MenuBar
+								setFormState={setFormState}
+								toggle={formToggle}
+								setFilter={setFilter}
+								filter={filter}
+							/>
 							<div className="mt-8 md:mt-14 lg:mt-16">
 								{invoices && (
-									<InvoiceList invoices={invoices} handleInvoiceIdxChange={handleInvoiceIdxChange} />
+									<InvoiceList
+										invoices={invoices}
+										handleInvoiceIdxChange={handleInvoiceIdxChange}
+										filter={filter}
+									/>
 								)}
 							</div>
 						</div>

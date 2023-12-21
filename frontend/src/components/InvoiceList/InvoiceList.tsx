@@ -7,14 +7,24 @@ import { IconArrowRight } from "../Icons";
 type InvoiceListProps = {
 	invoices: Invoice[];
 	handleInvoiceIdxChange: (i: InvoiceIdx) => void;
+	filter: string;
 };
 
-function InvoiceList({ invoices, handleInvoiceIdxChange }: InvoiceListProps) {
+function InvoiceList({ invoices, handleInvoiceIdxChange, filter }: InvoiceListProps) {
 	return (
 		<ul className="flex flex-col gap-4">
-			{invoices.map((invoice, i) => (
-				<InvoiceListItem key={i} invoice={invoice} idx={i} handleInvoiceIdxChange={handleInvoiceIdxChange} />
-			))}
+			{invoices.map((invoice, i) => {
+				if (filter === "" || filter === invoice.Status) {
+					return (
+						<InvoiceListItem
+							key={i}
+							invoice={invoice}
+							idx={i}
+							handleInvoiceIdxChange={handleInvoiceIdxChange}
+						/>
+					);
+				}
+			})}
 		</ul>
 	);
 }

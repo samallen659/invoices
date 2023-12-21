@@ -5,11 +5,12 @@ import { IconUpArrow, IconDownArrow, IconPlus } from "../Icons";
 type MenuBarProps = {
 	setFormState: (v: "new" | "edit") => void;
 	toggle: (t: boolean) => void;
+	filter: string;
+	setFilter: (s: string) => void;
 };
 
-function MenuBar({ setFormState, toggle }: MenuBarProps) {
+function MenuBar({ setFormState, toggle, filter, setFilter }: MenuBarProps) {
 	let invoiceCount = 1;
-	const [filter, setFilter] = useState<string>("");
 	const [showFilterMenu, setShowFilterMenu] = useState<boolean>(false);
 
 	const handleClick = () => {
@@ -18,6 +19,7 @@ function MenuBar({ setFormState, toggle }: MenuBarProps) {
 	};
 
 	const handleFilterMenuClick = (s: string) => {
+		s = s.toLowerCase();
 		if (s === filter) {
 			setFilter("");
 			return;
@@ -124,12 +126,12 @@ function FilterMenu({ filter, showFilterMenu, setShowFilterMenu, handleFilterMen
 								>
 									<div
 										className={`h-4 w-4 rounded-sm group-hover:border-2 group-hover:border-purple-400 ${
-											filter === status
+											filter === status.toLowerCase()
 												? "border-2 border-purple-400 bg-purple-400"
 												: "bg-gray-200 dark:bg-indigo-800"
 										}`}
 									>
-										{filter === status && <CheckIcon className="text-white" />}
+										{filter === status.toLowerCase() && <CheckIcon className="text-white" />}
 									</div>
 									<span className="dark:text-white">{status}</span>
 								</div>
