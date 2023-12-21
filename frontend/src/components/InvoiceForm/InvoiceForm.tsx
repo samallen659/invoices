@@ -103,6 +103,7 @@ function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 	const onDraftSubmit = (data: any) => {
 		setTotal(data);
 		data.Status = "draft";
+		data.PaymentDue = `${data.PaymentDue}T00:00:00Z`;
 		newMutation.mutate(data);
 	};
 
