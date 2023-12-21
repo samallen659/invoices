@@ -128,15 +128,20 @@ function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 		setValue(`Items.${i}.Total`, total);
 	};
 
+	const handleCancel = (event: any) => {
+		event.preventDefault();
+		toggle(false);
+	};
+
 	return (
-		<section className="relative mt-[80px] h-screen overflow-y-auto overflow-x-hidden overscroll-contain p-8 md:p-14 lg:ml-[103px] lg:mt-0">
+		<section className="relative  mt-[80px] h-screen overflow-y-auto overflow-x-hidden overscroll-contain p-8 md:p-14 lg:ml-[103px] lg:mt-0">
 			{!newMutation.isLoading ? (
 				<>
-					<button className="hidden w-24 items-center gap-5 lg:flex" onClick={() => toggle(false)}>
+					<button className="hidden w-24 items-center gap-5 lg:flex" onClick={handleCancel}>
 						<IconLeftArrow />
 						<span className="mt-1 font-bold dark:text-white">Go Back</span>
 					</button>
-					<form noValidate>
+					<form noValidate className="mb-14 md:mb-8 lg:mb-0">
 						<h3 className="mt-10 font-bold text-purple-400">Bill From</h3>
 						<div className="mt-6 grid grid-cols-2 gap-6">
 							<div className="col-span-2 flex flex-col gap-2">
@@ -423,15 +428,15 @@ function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 								<IconPlus /> <span className="-mb-1">Add New Item</span>
 							</button>
 						</div>
-						<div className="flex h-[91px] w-full items-center justify-end gap-2 p-6">
+						<div className="flex h-[91px] w-full items-center justify-end gap-2">
 							{state === "edit" ? (
 								<>
 									<CancelButton text={"Cancel"} onClick={() => toggle(false)} />
-									<SaveButton text={"Save Changes"} onClick={handleSubmit(onEditSubmit)} />
+									<SaveButton text={"Save Changes"} onClick={handleCancel} />
 								</>
 							) : (
 								<>
-									<CancelButton text={"Discard"} onClick={() => toggle(false)} />
+									<CancelButton text={"Discard"} onClick={handleCancel} />
 									<button
 										className="flex h-12 items-center justify-center rounded-full bg-[#373B53] p-4 text-gray-400 dark:text-gray-200"
 										onClick={handleSubmit(onDraftSubmit)}
