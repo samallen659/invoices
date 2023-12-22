@@ -7,6 +7,7 @@ import { InvoiceList } from "./components/InvoiceList/InvoiceList";
 import { useTransition } from "react-transition-state";
 import { ViewInvoice } from "./components/ViewInvoice/ViewInvoice";
 import { InvoiceForm } from "./components/InvoiceForm/InvoiceForm";
+import { IconSpinning, IconIllustrationEmpty } from "./components/Icons";
 
 export type InvoiceIdx = number;
 
@@ -57,15 +58,36 @@ function App() {
 								setFilter={setFilter}
 								filter={filter}
 							/>
-							<div className="mt-8 md:mt-14 lg:mt-16">
-								{invoices && (
-									<InvoiceList
-										invoices={invoices}
-										handleInvoiceIdxChange={handleInvoiceIdxChange}
-										filter={filter}
-									/>
-								)}
-							</div>
+							{isLoading ? (
+								<div className="absolute left-1/2 top-1/2 -translate-x-1/2  -translate-y-1/2 pt-20 lg:pl-[103px] lg:pt-0">
+									<IconSpinning />
+								</div>
+							) : (
+								<div className="mt-8 md:mt-14 lg:mt-16">
+									{invoices && invoices?.length > 0 ? (
+										<InvoiceList
+											invoices={invoices}
+											handleInvoiceIdxChange={handleInvoiceIdxChange}
+											filter={filter}
+										/>
+									) : (
+										<div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center gap-10 pt-20 lg:pl-[103px] lg:pt-0">
+											<IconIllustrationEmpty />
+											<div className="flex flex-col gap-6">
+												<h2 className="text-2xl font-bold text-gray-800 dark:text-white">
+													There is nothing here
+												</h2>
+												<p className="text-center text-sm text-gray-400">
+													Create an invoice by clicking the
+													<br />
+													New <span className="hidden md:inline">invoice </span>
+													button and get started
+												</p>
+											</div>
+										</div>
+									)}
+								</div>
+							)}
 						</div>
 					)}
 					{isViewing && (
