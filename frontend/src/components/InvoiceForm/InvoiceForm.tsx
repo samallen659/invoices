@@ -1,7 +1,7 @@
 import { Invoice } from "../../types";
-import { useForm, useFieldArray, FieldErrors } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { IconDelete, IconLeftArrow, IconPlus, IconSpinning } from "../Icons";
-import { ChangeEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { editInvoice, newInvoice } from "../../api";
 import { useMutation, useQueryClient } from "react-query";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -116,13 +116,13 @@ function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 		i.Total = total;
 	};
 
-	const handleItemPriceChange = (e: ChangeEvent<HTMLInputElement>, i: number) => {
+	const handleItemPriceChange = (e: any, i: number) => {
 		const item = getValues(`Items.${i}`);
 		const total = item.Quantity * e.target.value;
 		setValue(`Items.${i}.Total`, total);
 	};
 
-	const handleItemQuantityChange = (e: ChangeEvent<HTMLInputElement>, i: number) => {
+	const handleItemQuantityChange = (e: any, i: number) => {
 		const item = getValues(`Items.${i}`);
 		const total = e.target.value * item.Price;
 		setValue(`Items.${i}.Total`, total);
@@ -484,14 +484,14 @@ function SaveButton({ text, onClick }: SaveButtonProps) {
 
 type CancelButtonProps = {
 	text: string;
-	onClick: () => void;
+	onClick: (e: any) => void;
 };
 
 function CancelButton({ text, onClick }: CancelButtonProps) {
 	return (
 		<button
 			className="flex h-12 items-center justify-center rounded-full bg-[#F9FAFE] p-4 text-center text-indigo-200 dark:bg-gray-600 dark:text-gray-200"
-			onClick={onClick}
+			onClick={(e: any) => onClick(e)}
 		>
 			{text}
 		</button>
