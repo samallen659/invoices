@@ -438,8 +438,8 @@ function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 						<div className="flex h-[91px] w-full items-center justify-end gap-2">
 							{state === "edit" ? (
 								<>
-									<CancelButton text={"Cancel"} onClick={() => toggle(false)} />
-									<SaveButton text={"Save Changes"} onClick={handleCancel} />
+									<CancelButton text={"Cancel"} onClick={handleCancel} />
+									<SaveButton text={"Save Changes"} onClick={handleSubmit(onEditSubmit)} />
 								</>
 							) : (
 								<>
@@ -507,15 +507,14 @@ function FormErrors({ errors }: FormErrorsProps) {
 	const [errorVals, setErrorVals] = useState<string[]>([]);
 
 	useEffect(() => {
-        console.log('effect')
+		console.log("effect");
 		if (keys.includes("Items") && keys.length >= 2) {
 			setErrorVals(["All fields must be added", "An item must be added"]);
-		}
-        else if (!keys.includes("Items") && keys.length >= 1) {
+		} else if (!keys.includes("Items") && keys.length >= 1) {
 			setErrorVals(["All fields must be added"]);
-		}else if(keys.includes("Items") && keys.length === 1) {
+		} else if (keys.includes("Items") && keys.length === 1) {
 			setErrorVals(["An item must be added"]);
-        }else if(keys.length === 0) {
+		} else if (keys.length === 0) {
 			setErrorVals([]);
 		}
 	}, [errors]);
