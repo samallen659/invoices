@@ -198,7 +198,7 @@ function ViewInvoiceDetails({ invoice }: ViewInvoiceDetailsProps) {
 				</div>
 			</div>
 			<div className="mt-8 rounded-md bg-off-white dark:bg-gray-600">
-				<div className="md:grid-col-5  hidden gap-4 p-6">
+				<div className="md:grid-col-5 hidden gap-4 p-6 md:grid">
 					<h4 className="col-span-2 col-start-1 hidden text-indigo-200 dark:text-gray-200 md:block">
 						Item Name
 					</h4>
