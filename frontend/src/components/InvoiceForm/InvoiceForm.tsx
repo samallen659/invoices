@@ -1,7 +1,7 @@
 import { Invoice } from "../../types";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm, useFieldArray, FieldErrors } from "react-hook-form";
 import { IconDelete, IconLeftArrow, IconPlus, IconSpinning } from "../Icons";
-import { ChangeEvent } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { editInvoice, newInvoice } from "../../api";
 import { useMutation, useQueryClient } from "react-query";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -132,6 +132,10 @@ function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 		event.preventDefault();
 		toggle(false);
 	};
+
+	useEffect(() => {
+		console.log(errors);
+	}, [errors]);
 
 	return (
 		<section className="relative  mt-[80px] h-screen overflow-y-auto overflow-x-hidden overscroll-contain p-8 md:p-14 lg:ml-[103px] lg:mt-0">
@@ -428,6 +432,9 @@ function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 								<IconPlus /> <span className="-mb-1">Add New Item</span>
 							</button>
 						</div>
+						<div className="flex flex-col">
+							{Object.keys(errors).length !== 0 && <FormErrors errors={errors} />}
+						</div>
 						<div className="flex h-[91px] w-full items-center justify-end gap-2">
 							{state === "edit" ? (
 								<>
@@ -488,6 +495,37 @@ function CancelButton({ text, onClick }: CancelButtonProps) {
 		>
 			{text}
 		</button>
+	);
+}
+
+type FormErrorsProps = {
+	errors: any;
+};
+
+function FormErrors({ errors }: FormErrorsProps) {
+	const keys = Object.keys(errors);
+	const [errorVals, setErrorVals] = useState<string[]>([]);
+
+	useEffect(() => {
+        console.log('effect')
+		if (keys.includes("Items") && keys.length >= 2) {
+			setErrorVals(["All fields must be added", "An item must be added"]);
+		}
+        else if (!keys.includes("Items") && keys.length >= 1) {
+			setErrorVals(["All fields must be added"]);
+		}else if(keys.includes("Items") && keys.length === 1) {
+			setErrorVals(["An item must be added"]);
+        }else if(keys.length === 0) {
+			setErrorVals([]);
+		}
+	}, [errors]);
+
+	return (
+		<div className="mt-6 flex flex-col">
+			{errorVals.map((val: string, i: number) => (
+				<p key={i} className="text-sm text-red-400">{`- ${val}`}</p>
+			))}
+		</div>
 	);
 }
 
