@@ -1,6 +1,7 @@
 package invoice_test
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -8,6 +9,7 @@ import (
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/google/uuid"
 	transport "github.com/samallen659/invoices/backend/internal"
 	"github.com/samallen659/invoices/backend/internal/invoice"
 	"github.com/testcontainers/testcontainers-go"
@@ -43,17 +45,15 @@ func TestInvoiceDomain(t *testing.T) {
 		log.Fatal(err)
 	}
 
+	invReq := createInvoiceRequest(t)
+	var id uuid.UUID
 	t.Run("HandleGetByID returns status code 400 for bad ID path variable", func(t *testing.T) {
 		w := httptest.NewRecorder()
-		req, err := http.NewRequest(http.MethodGet, "/invoice/123", nil)
-		if err != nil {
-			t.Fatalf("failed to create http request: %s", err.Error())
-		}
+		req := createHTTPRequest(t, http.MethodGet, "/invoice/123", nil)
 		server.Router.ServeHTTP(w, req)
 
-		if w.Code != http.StatusBadRequest {
-			t.Errorf("Unexpected error code, received: %d expected: %d", w.Code, http.StatusBadRequest)
-		}
+		assertHTTPStatusCode(t, w.Code, http.StatusBadRequest)
+
 		var receivedError invoice.ErrorResponse
 		json.Unmarshal(w.Body.Bytes(), &receivedError)
 
@@ -61,7 +61,64 @@ func TestInvoiceDomain(t *testing.T) {
 			t.Errorf("Unexpected error received in body")
 		}
 	})
+	t.Run("HandleStore saves new invoice", func(t *testing.T) {
+		w := httptest.NewRecorder()
+		invReqJson, _ := json.Marshal(invReq)
+		req := createHTTPRequest(t, http.MethodPost, "/invoice", &invReqJson)
+		server.Router.ServeHTTP(w, req)
 
+		assertHTTPStatusCode(t, w.Code, http.StatusOK)
+
+		body := unmarshalResponse(t, w.Body.Bytes())
+		id = body.Invoice[0].ID
+
+		if body.Invoice[0].Description != invReq.Description {
+			t.Error("Returned Invoice does not match supplied invoice request")
+		}
+	})
+	t.Run("HandleUpdate edits the invoice", func(t *testing.T) {
+		w := httptest.NewRecorder()
+		invReq.Description = "Changed Description"
+		invReqJson, _ := json.Marshal(invReq)
+		req := createHTTPRequest(t, http.MethodPut, fmt.Sprintf("/invoice/%s", id.String()), &invReqJson)
+		server.Router.ServeHTTP(w, req)
+
+		assertHTTPStatusCode(t, w.Code, http.StatusOK)
+
+		body := unmarshalResponse(t, w.Body.Bytes())
+
+		if body.Invoice[0].Description != "Changed Description" {
+			t.Error("Returned Invoice has not had the description correctly edited")
+		}
+	})
+	t.Run("HandleGetByID returns correct Invoice", func(t *testing.T) {
+		w := httptest.NewRecorder()
+		req := createHTTPRequest(t, http.MethodGet, fmt.Sprintf("/invoice/%s", id.String()), nil)
+		server.Router.ServeHTTP(w, req)
+
+		assertHTTPStatusCode(t, w.Code, http.StatusOK)
+
+		body := unmarshalResponse(t, w.Body.Bytes())
+
+		if body.Invoice[0].ID.String() != id.String() {
+			t.Error("Returned Invoice ID is incorrect")
+		}
+	})
+	t.Run("HandleDelete deletes Invoice", func(t *testing.T) {
+		w := httptest.NewRecorder()
+		req := createHTTPRequest(t, http.MethodDelete, fmt.Sprintf("/invoice/%s", id.String()), nil)
+		server.Router.ServeHTTP(w, req)
+
+		assertHTTPStatusCode(t, w.Code, http.StatusOK)
+
+		//check deleted invoice not returned
+		w = httptest.NewRecorder()
+		req = createHTTPRequest(t, http.MethodGet, fmt.Sprintf("/invoice/%s", id.String()), nil)
+
+		server.Router.ServeHTTP(w, req)
+
+		assertHTTPStatusCode(t, w.Code, http.StatusBadRequest)
+	})
 }
 
 func setupInvoiceDomain(connStr string) (*invoice.Handler, error) {
@@ -144,4 +201,45 @@ func migrateDB(hostPort string) error {
 	}
 	log.Println("migration done")
 	return nil
+}
+
+func createHTTPRequest(t testing.TB, method string, route string, body *[]byte) *http.Request {
+	t.Helper()
+
+	var req *http.Request
+	var err error
+	if body != nil {
+		b := bytes.NewReader(*body)
+		req, err = http.NewRequest(method, route, b)
+		if err != nil {
+			t.Fatalf("failed creating http request: %s", err.Error())
+		}
+	} else {
+		req, err = http.NewRequest(method, route, nil)
+		if err != nil {
+			t.Fatalf("failed creating http request: %s", err.Error())
+		}
+	}
+
+	return req
+}
+
+func assertHTTPStatusCode(t testing.TB, desiredCode int, returnedCode int) {
+	t.Helper()
+
+	if returnedCode != desiredCode {
+		t.Errorf("Unexpected error code, received: %d expected: %d", returnedCode, desiredCode)
+	}
+}
+
+func unmarshalResponse(t testing.TB, bodyBytes []byte) invoice.InvoiceResponse {
+	t.Helper()
+
+	var body invoice.InvoiceResponse
+	err := json.Unmarshal(bodyBytes, &body)
+	if err != nil {
+		t.Fatalf("Failed to unmarshal response: %s", err.Error())
+	}
+
+	return body
 }
