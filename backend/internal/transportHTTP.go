@@ -3,13 +3,17 @@ package transport
 import (
 	"net/http"
 
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/samallen659/invoices/backend/internal/invoice"
 )
 
 type Server struct {
-	invHandler *invoice.Handler
-	Router     *mux.Router
+	invHandler  *invoice.Handler
+	Router      *mux.Router
+	methods     handlers.CORSOption
+	credentials handlers.CORSOption
+	origins     handlers.CORSOption
 }
 
 func NewServer(invHandler *invoice.Handler) (*Server, error) {
@@ -21,11 +25,20 @@ func NewServer(invHandler *invoice.Handler) (*Server, error) {
 	router.HandleFunc("/invoice", invHandler.HandleGetAll).Methods(http.MethodGet)
 	router.HandleFunc("/invoice", invHandler.HandleStore).Methods(http.MethodPost)
 
-	return &Server{invHandler: invHandler, Router: router}, nil
+	methods := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE"})
+	credentials := handlers.AllowCredentials()
+	origins := handlers.AllowedOrigins([]string{"localhost:5173"})
+
+	return &Server{
+		invHandler:  invHandler,
+		Router:      router,
+		methods:     methods,
+		credentials: credentials,
+		origins:     origins}, nil
 }
 
 func (s *Server) Serve(port string) error {
-	if err := http.ListenAndServe(port, s.Router); err != nil {
+	if err := http.ListenAndServe(port, handlers.CORS(s.credentials, s.methods, s.origins)(s.Router)); err != nil {
 		return err
 	}
 	return nil
