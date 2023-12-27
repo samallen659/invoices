@@ -2,34 +2,28 @@ package user
 
 import (
 	"context"
-	"github.com/coreos/go-oidc"
-	"golang.org/x/oauth2"
+
+	"github.com/aws/aws-sdk-go-v2/config"
+	cip "github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider"
 )
 
-type Authenticator struct {
-	*oidc.Provider
-	oauth2.Config
+type Authenticator interface {
+	SignUp(email string, firstName string, lastName string, password string) (error, string)
 }
 
-func NewAuthenticator(auth0_domain, auth0_client_id, auth0_client_secret, auth0_callback_url string) (*Authenticator, error) {
-	provider, err := oidc.NewProvider(
-		context.Background(),
-		"https://"+auth0_domain+"/",
-	)
+type CognitoAuthenticator struct {
+	AppClientID   string
+	cognitoClient *cip.Client
+}
+
+func NewCognitoAuthentication(cognitoClientID string) (*CognitoAuthenticator, error) {
+	cfg, err := config.LoadDefaultConfig(context.Background())
 	if err != nil {
 		return nil, err
 	}
 
-	conf := oauth2.Config{
-		ClientID:     auth0_client_id,
-		ClientSecret: auth0_client_secret,
-		RedirectURL:  auth0_callback_url,
-		Endpoint:     provider.Endpoint(),
-		Scopes:       []string{oidc.ScopeOpenID, "profile"},
-	}
-
-	return &Authenticator{
-		Provider: provider,
-		Config:   conf,
+	return &CognitoAuthenticator{
+		AppClientID:   cognitoClientID,
+		cognitoClient: cip.NewFromConfig(cfg),
 	}, nil
 }
