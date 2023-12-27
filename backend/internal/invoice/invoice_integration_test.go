@@ -6,15 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/golang-migrate/migrate/v4"
-	_ "github.com/golang-migrate/migrate/v4/database/postgres"
-	_ "github.com/golang-migrate/migrate/v4/source/file"
-	"github.com/google/uuid"
-	transport "github.com/samallen659/invoices/backend/internal"
-	"github.com/samallen659/invoices/backend/internal/invoice"
-	"github.com/testcontainers/testcontainers-go"
-	"github.com/testcontainers/testcontainers-go/modules/postgres"
-	"github.com/testcontainers/testcontainers-go/wait"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -22,6 +13,16 @@ import (
 	"runtime"
 	"testing"
 	"time"
+
+	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/google/uuid"
+	"github.com/gorilla/mux"
+	"github.com/samallen659/invoices/backend/internal/invoice"
+	"github.com/testcontainers/testcontainers-go"
+	"github.com/testcontainers/testcontainers-go/modules/postgres"
+	"github.com/testcontainers/testcontainers-go/wait"
 )
 
 const (
@@ -40,10 +41,7 @@ func TestInvoiceDomain(t *testing.T) {
 		t.Errorf("failed setting up invoice domain for integration test: %s", err.Error())
 	}
 
-	server, err := transport.NewServer(invHandler)
-	if err != nil {
-		log.Fatal(err)
-	}
+	server := newServer(invHandler)
 
 	invReq := createInvoiceRequest(t)
 	var id uuid.UUID
@@ -119,6 +117,30 @@ func TestInvoiceDomain(t *testing.T) {
 
 		assertHTTPStatusCode(t, w.Code, http.StatusBadRequest)
 	})
+}
+
+type Server struct {
+	Router *mux.Router
+}
+
+func newServer(invHandler *invoice.Handler) *Server {
+	router := mux.NewRouter()
+	router.HandleFunc("/invoice/{id}", invHandler.HandleGetByID).Methods(http.MethodGet)
+	router.HandleFunc("/invoice/{id}", invHandler.HandleUpdate).Methods(http.MethodPut)
+	router.HandleFunc("/invoice/{id}", invHandler.HandleDelete).Methods(http.MethodDelete)
+	router.HandleFunc("/invoice", invHandler.HandleGetAll).Methods(http.MethodGet)
+	router.HandleFunc("/invoice", invHandler.HandleStore).Methods(http.MethodPost)
+
+	return &Server{
+		Router: router,
+	}
+}
+
+func (s *Server) Serve(port string) error {
+	if err := http.ListenAndServe(port, s.Router); err != nil {
+		return err
+	}
+	return nil
 }
 
 func setupInvoiceDomain(connStr string) (*invoice.Handler, error) {

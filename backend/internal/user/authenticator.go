@@ -27,3 +27,7 @@ func NewCognitoAuthentication(cognitoClientID string) (*CognitoAuthenticator, er
 		cognitoClient: cip.NewFromConfig(cfg),
 	}, nil
 }
+
+func (c *CognitoAuthenticator) SignUp(email, firstName, lastName, password string) (error, string) {
+	return nil, ""
+}

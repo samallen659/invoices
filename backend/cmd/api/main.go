@@ -5,6 +5,7 @@ import (
 	"github.com/joho/godotenv"
 	transport "github.com/samallen659/invoices/backend/internal"
 	"github.com/samallen659/invoices/backend/internal/invoice"
+	"github.com/samallen659/invoices/backend/internal/user"
 	"log"
 	"os"
 )
@@ -18,26 +19,40 @@ func main() {
 	postgresUser := os.Getenv("POSTGRES_USER")
 	postgresPass := os.Getenv("POSTGRES_PASSWORD")
 	postgresDB := os.Getenv("POSTGRES_DB")
+	cognitoClientID := os.Getenv("COGNITO_CLIENT_ID")
 
 	postgresConnStr := fmt.Sprintf("user=%s dbname=%s sslmode=disable password=%s host=localhost",
 		postgresUser, postgresDB, postgresPass)
 
-	repo, err := invoice.NewPostgresRespository(postgresConnStr)
+	//Invoice setup
+	invRepo, err := invoice.NewPostgresRespository(postgresConnStr)
+	if err != nil {
+		log.Fatal(err)
+	}
+	invSvc, err := invoice.NewService(invRepo)
+	if err != nil {
+		log.Fatal(err)
+	}
+	invHandler, err := invoice.NewHandler(invSvc)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	svc, err := invoice.NewService(repo)
+	//User setup
+	usrAuth, err := user.NewCognitoAuthentication(cognitoClientID)
+	if err != nil {
+		log.Fatal(err)
+	}
+	usrSvc, err := user.NewService(usrAuth)
+	if err != nil {
+		log.Fatal(err)
+	}
+	usrHandler, err := user.NewHandler(usrSvc)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	invHandler, err := invoice.NewHandler(svc)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	server, err := transport.NewServer(invHandler)
+	server, err := transport.NewServer(invHandler, usrHandler)
 	if err != nil {
 		log.Fatal(err)
 	}

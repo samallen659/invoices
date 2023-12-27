@@ -1,14 +1,16 @@
 package user
 
+import "fmt"
+
 type Service struct {
-	repo Repository
 	auth Authenticator
 }
 
-func NewService(repo Repository, auth Authenticator) (*Service, error) {
-	return &Service{repo: repo, auth: auth}, nil
+func NewService(auth Authenticator) (*Service, error) {
+	return &Service{auth: auth}, nil
 }
 
-func (s *Service) SignUp() error {
+func (s *Service) SignUp(req SignUpRequest) error {
+	fmt.Println(req)
 	return nil
 }

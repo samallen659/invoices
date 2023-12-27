@@ -1,11 +1,11 @@
 package transport
 
 import (
-	"net/http"
-
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/samallen659/invoices/backend/internal/invoice"
+	"github.com/samallen659/invoices/backend/internal/user"
+	"net/http"
 )
 
 type Server struct {
@@ -16,7 +16,7 @@ type Server struct {
 	origins     handlers.CORSOption
 }
 
-func NewServer(invHandler *invoice.Handler) (*Server, error) {
+func NewServer(invHandler *invoice.Handler, usrHandler *user.Handler) (*Server, error) {
 	router := mux.NewRouter()
 
 	router.HandleFunc("/invoice/{id}", invHandler.HandleGetByID).Methods(http.MethodGet)
@@ -24,6 +24,8 @@ func NewServer(invHandler *invoice.Handler) (*Server, error) {
 	router.HandleFunc("/invoice/{id}", invHandler.HandleDelete).Methods(http.MethodDelete)
 	router.HandleFunc("/invoice", invHandler.HandleGetAll).Methods(http.MethodGet)
 	router.HandleFunc("/invoice", invHandler.HandleStore).Methods(http.MethodPost)
+
+	router.HandleFunc("/user/signup", usrHandler.HandleSignUp).Methods(http.MethodPost)
 
 	methods := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE"})
 	credentials := handlers.AllowCredentials()
