@@ -20,6 +20,7 @@ func main() {
 	postgresPass := os.Getenv("POSTGRES_PASSWORD")
 	postgresDB := os.Getenv("POSTGRES_DB")
 	cognitoClientID := os.Getenv("COGNITO_CLIENT_ID")
+	cognitoClientSecret := os.Getenv("COGNITO_CLIENT_SECRET")
 
 	postgresConnStr := fmt.Sprintf("user=%s dbname=%s sslmode=disable password=%s host=localhost",
 		postgresUser, postgresDB, postgresPass)
@@ -39,7 +40,7 @@ func main() {
 	}
 
 	//User setup
-	usrAuth, err := user.NewCognitoAuthentication(cognitoClientID)
+	usrAuth, err := user.NewCognitoAuthentication(cognitoClientID, cognitoClientSecret)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -28,7 +28,7 @@ func (h *Handler) HandleSignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.svc.SignUp(signUpReq)
+	err = h.svc.SignUp(r.Context(), signUpReq)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
