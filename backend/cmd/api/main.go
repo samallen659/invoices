@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/joho/godotenv"
-	transport "github.com/samallen659/invoices/backend/internal"
 	"github.com/samallen659/invoices/backend/internal/invoice"
+	"github.com/samallen659/invoices/backend/internal/transport"
 	"github.com/samallen659/invoices/backend/internal/user"
 	"log"
 	"os"
