@@ -22,6 +22,7 @@ type AccessTokenResponse struct {
 	AccessToken  string `json:"access_token"`
 	IDToken      string `json:"id_token"`
 	RefreshToken string `json:"refresh_token"`
+	TokenType    string `json:"token_type"`
 	ExpiresIn    int    `json:"expires_in"`
 }
 
@@ -47,7 +48,7 @@ func NewCognitoAuthenticator() (*CognitoAuthenticator, error) {
 }
 
 func (c *CognitoAuthenticator) GetLoginURL() string {
-	return fmt.Sprintf("%s%s?client_id=%s&scope=aws.cognito.signin.user.admin+email+profile&response_type=code&redirect_uri=%s", c.Domain, AUTH_URL_PATH, c.ClientID, c.CallbackURL)
+	return fmt.Sprintf("%s%s?client_id=%s&scope=aws.cognito.signin.user.admin+email+profile+openid&response_type=code&redirect_uri=%s", c.Domain, AUTH_URL_PATH, c.ClientID, c.CallbackURL)
 }
 
 func (c *CognitoAuthenticator) GetAccessToken(ctx context.Context, authCode string) (string, error) {
@@ -57,9 +58,8 @@ func (c *CognitoAuthenticator) GetAccessToken(ctx context.Context, authCode stri
 	client := http.Client{}
 	data := url.Values{}
 	data.Add("client_id", c.ClientID)
-	data.Add("client_secret", c.ClientSecret)
 	data.Add("grant_type", "authorization_code")
-	data.Add("scope", "profile")
+	// data.Add("scope", "profile")
 	data.Add("redirect_uri", c.CallbackURL)
 	data.Add("code", authCode)
 
@@ -75,18 +75,18 @@ func (c *CognitoAuthenticator) GetAccessToken(ctx context.Context, authCode stri
 		return "", err
 	}
 
-	fmt.Println(resp.StatusCode)
-	fmt.Println(resp.Header)
-	fmt.Println(resp.Body)
-
-	var jsonResp AccessTokenResponse
-	err = json.NewDecoder(resp.Body).Decode(&jsonResp)
+	var accessTokenResp AccessTokenResponse
+	err = json.NewDecoder(resp.Body).Decode(&accessTokenResp)
 	if err != nil {
 		fmt.Println("here")
 		return "", err
 	}
 
-	fmt.Println(jsonResp)
+	fmt.Printf("AccessToken: %s\n", accessTokenResp.AccessToken)
+	fmt.Printf("IDToken: %s\n", accessTokenResp.IDToken)
+	fmt.Printf("RefreshToken: %s\n", accessTokenResp.RefreshToken)
+	fmt.Printf("TokenType: %s\n", accessTokenResp.TokenType)
+	fmt.Printf("ExpiresIn: %d\n", accessTokenResp.ExpiresIn)
 
 	return "", nil
 }

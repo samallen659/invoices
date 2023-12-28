@@ -2,6 +2,7 @@ package user
 
 import (
 	"fmt"
+	"github.com/samallen659/invoices/backend/internal/session"
 	"net/http"
 )
 
@@ -26,10 +27,13 @@ func (h *Handler) HandleLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) HandleCallback(w http.ResponseWriter, r *http.Request) {
-	fmt.Println(r.URL)
-	fmt.Println(r.Body)
+	session, err := session.Get(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	fmt.Println(session)
 	code := r.URL.Query().Get("code")
-	fmt.Println(code)
 
 	token, err := h.svc.GetAccessToken(r.Context(), code)
 	if err != nil {
