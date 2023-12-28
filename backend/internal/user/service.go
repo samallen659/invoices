@@ -2,7 +2,7 @@ package user
 
 import (
 	"context"
-	"fmt"
+	// "fmt"
 )
 
 type Service struct {
@@ -13,12 +13,14 @@ func NewService(auth *CognitoAuthenticator) (*Service, error) {
 	return &Service{auth: auth}, nil
 }
 
-func (s *Service) SignUp(ctx context.Context, req SignUpRequest) error {
-	out, err := s.auth.SignUp(ctx, req.Email, req.FirstName, req.LastName, req.Password)
-	if err != nil {
-		return err
-	}
+func (s *Service) GetLoginURL() string {
+	return s.auth.GetLoginURL()
+}
 
-	fmt.Println(out)
-	return nil
+func (s *Service) GetAccessToken(ctx context.Context, authCode string) (string, error) {
+	token, err := s.auth.GetAccessToken(ctx, authCode)
+	if err != nil {
+		return "", err
+	}
+	return token, nil
 }

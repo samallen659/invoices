@@ -5,65 +5,101 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/base64"
-
-	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/config"
-	cip "github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider"
-	cipTypes "github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider/types"
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"net/url"
+	"os"
+	"strings"
 )
 
-type CognitoAuthenticator struct {
-	AppClientID     string
-	AppClientSecret string
-	cognitoClient   *cip.Client
+const (
+	AUTH_URL_PATH  = "/oauth2/authorize"
+	TOKEN_URL_PATH = "/oauth2/token"
+)
+
+type AccessTokenResponse struct {
+	AccessToken  string `json:"access_token"`
+	IDToken      string `json:"id_token"`
+	RefreshToken string `json:"refresh_token"`
+	ExpiresIn    int    `json:"expires_in"`
 }
 
-func NewCognitoAuthentication(cognitoClientID string, AppClientSecret string) (*CognitoAuthenticator, error) {
-	cfg, err := config.LoadDefaultConfig(context.Background())
-	if err != nil {
-		return nil, err
-	}
+type CognitoAuthenticator struct {
+	ClientID     string
+	ClientSecret string
+	Domain       string
+	CallbackURL  string
+}
+
+func NewCognitoAuthenticator() (*CognitoAuthenticator, error) {
+	cognitoClientID := os.Getenv("COGNITO_CLIENT_ID")
+	cognitoClientSecret := os.Getenv("COGNITO_CLIENT_SECRET")
+	cognitoDomain := os.Getenv("COGNITO_DOMAIN")
+	cognitoCallbackURL := os.Getenv("COGNITO_CALLBACK_URL")
 
 	return &CognitoAuthenticator{
-		AppClientID:   cognitoClientID,
-		cognitoClient: cip.NewFromConfig(cfg),
+		ClientID:     cognitoClientID,
+		ClientSecret: cognitoClientSecret,
+		Domain:       cognitoDomain,
+		CallbackURL:  cognitoCallbackURL,
 	}, nil
 }
 
-func (c *CognitoAuthenticator) SignUp(ctx context.Context, email, firstName, lastName, password string) (*cip.SignUpOutput, error) {
-	secretHash := computeSecretHash(c.AppClientSecret, email, c.AppClientID)
-	awsReq := &cip.SignUpInput{
-		ClientId: aws.String(c.AppClientID),
-		Password: aws.String(password),
-		Username: aws.String(email),
-		UserAttributes: []cipTypes.AttributeType{
-			{
-				Name:  aws.String("email"),
-				Value: aws.String(email),
-			},
-			{
-				Name:  aws.String("given_name"),
-				Value: aws.String(firstName),
-			},
-			{
-				Name:  aws.String("family_name"),
-				Value: aws.String(lastName),
-			},
-		},
-		SecretHash: aws.String(secretHash),
-	}
+func (c *CognitoAuthenticator) GetLoginURL() string {
+	return fmt.Sprintf("%s%s?client_id=%s&scope=aws.cognito.signin.user.admin+email+profile&response_type=code&redirect_uri=%s", c.Domain, AUTH_URL_PATH, c.ClientID, c.CallbackURL)
+}
 
-	out, err := c.cognitoClient.SignUp(ctx, awsReq)
+func (c *CognitoAuthenticator) GetAccessToken(ctx context.Context, authCode string) (string, error) {
+	base64Auth := computeBase64Authorization(c.ClientID, c.ClientSecret)
+	fmt.Println(base64Auth)
+
+	client := http.Client{}
+	data := url.Values{}
+	data.Add("client_id", c.ClientID)
+	data.Add("client_secret", c.ClientSecret)
+	data.Add("grant_type", "authorization_code")
+	data.Add("scope", "profile")
+	data.Add("redirect_uri", c.CallbackURL)
+	data.Add("code", authCode)
+
+	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("%s%s", c.Domain, TOKEN_URL_PATH), strings.NewReader(data.Encode()))
 	if err != nil {
-		return nil, err
+		return "", err
+	}
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Add("Authorization", fmt.Sprintf("Basic %s", base64Auth))
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
 	}
 
-	return out, nil
+	fmt.Println(resp.StatusCode)
+	fmt.Println(resp.Header)
+	fmt.Println(resp.Body)
+
+	var jsonResp AccessTokenResponse
+	err = json.NewDecoder(resp.Body).Decode(&jsonResp)
+	if err != nil {
+		fmt.Println("here")
+		return "", err
+	}
+
+	fmt.Println(jsonResp)
+
+	return "", nil
 }
 
 func computeSecretHash(clientSecret string, email string, clientID string) string {
 	mac := hmac.New(sha256.New, []byte(clientSecret))
 	mac.Write([]byte(email + clientID))
 
-	return base64.StdEncoding.EncodeToString(mac.Sum(nil))
+	hash := base64.StdEncoding.EncodeToString(mac.Sum(nil))
+	fmt.Println(hash)
+	return hash
+}
+
+func computeBase64Authorization(clientID string, clientSecret string) string {
+	return base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:%s", clientID, clientSecret)))
 }

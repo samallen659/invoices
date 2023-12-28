@@ -25,7 +25,8 @@ func NewServer(invHandler *invoice.Handler, usrHandler *user.Handler) (*Server, 
 	router.HandleFunc("/invoice", invHandler.HandleGetAll).Methods(http.MethodGet)
 	router.HandleFunc("/invoice", invHandler.HandleStore).Methods(http.MethodPost)
 
-	router.HandleFunc("/user/signup", usrHandler.HandleSignUp).Methods(http.MethodPost)
+	router.HandleFunc("/user/login", usrHandler.HandleLogin).Methods(http.MethodGet)
+	router.HandleFunc("/user/callback", usrHandler.HandleCallback).Methods(http.MethodGet)
 
 	methods := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE"})
 	credentials := handlers.AllowCredentials()

@@ -1,7 +1,7 @@
 package user
 
 import (
-	"encoding/json"
+	"fmt"
 	"net/http"
 )
 
@@ -20,17 +20,21 @@ func NewHandler(svc *Service) (*Handler, error) {
 	return &Handler{svc: svc}, nil
 }
 
-func (h *Handler) HandleSignUp(w http.ResponseWriter, r *http.Request) {
-	var signUpReq SignUpRequest
-	err := json.NewDecoder(r.Body).Decode(&signUpReq)
+func (h *Handler) HandleLogin(w http.ResponseWriter, r *http.Request) {
+	loginUrl := h.svc.GetLoginURL()
+	http.Redirect(w, r, loginUrl, http.StatusSeeOther)
+}
+
+func (h *Handler) HandleCallback(w http.ResponseWriter, r *http.Request) {
+	fmt.Println(r.URL)
+	fmt.Println(r.Body)
+	code := r.URL.Query().Get("code")
+	fmt.Println(code)
+
+	token, err := h.svc.GetAccessToken(r.Context(), code)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
+		http.Error(w, "Failed", http.StatusBadRequest)
 	}
 
-	err = h.svc.SignUp(r.Context(), signUpReq)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
+	fmt.Println(token)
 }
