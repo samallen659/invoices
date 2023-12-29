@@ -1,13 +1,15 @@
 package session
 
 import (
-	"net/http"
-	"os"
-
 	gssessions "github.com/gorilla/sessions"
+	"net/http"
 )
 
-var store = gssessions.NewCookieStore([]byte(os.Getenv("SESSION_KEY")))
+var store *gssessions.CookieStore
+
+func New(sessionSecret string) {
+	store = gssessions.NewCookieStore([]byte(sessionSecret))
+}
 
 func Get(req *http.Request) (*gssessions.Session, error) {
 	return store.Get(req, "session-name")

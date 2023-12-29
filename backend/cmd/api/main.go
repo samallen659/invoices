@@ -2,12 +2,14 @@ package main
 
 import (
 	"fmt"
-	"github.com/joho/godotenv"
-	"github.com/samallen659/invoices/backend/internal/invoice"
-	"github.com/samallen659/invoices/backend/internal/transport"
-	"github.com/samallen659/invoices/backend/internal/user"
 	"log"
 	"os"
+
+	"github.com/joho/godotenv"
+	"github.com/samallen659/invoices/backend/internal/invoice"
+	"github.com/samallen659/invoices/backend/internal/session"
+	"github.com/samallen659/invoices/backend/internal/transport"
+	"github.com/samallen659/invoices/backend/internal/user"
 )
 
 func main() {
@@ -22,6 +24,8 @@ func main() {
 
 	postgresConnStr := fmt.Sprintf("user=%s dbname=%s sslmode=disable password=%s host=localhost",
 		postgresUser, postgresDB, postgresPass)
+
+	session.New(os.Getenv("SESSION_SECRET"))
 
 	//Invoice setup
 	invRepo, err := invoice.NewPostgresRespository(postgresConnStr)
