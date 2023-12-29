@@ -18,7 +18,7 @@ const (
 	TOKEN_URL_PATH = "/oauth2/token"
 )
 
-type AccessTokenResponse struct {
+type TokenResponse struct {
 	AccessToken  string `json:"access_token"`
 	IDToken      string `json:"id_token"`
 	RefreshToken string `json:"refresh_token"`
@@ -75,18 +75,18 @@ func (c *CognitoAuthenticator) GetAccessToken(ctx context.Context, authCode stri
 		return "", err
 	}
 
-	var accessTokenResp AccessTokenResponse
-	err = json.NewDecoder(resp.Body).Decode(&accessTokenResp)
+	var tokenResp TokenResponse
+	err = json.NewDecoder(resp.Body).Decode(&tokenResp)
 	if err != nil {
 		fmt.Println("here")
 		return "", err
 	}
 
-	fmt.Printf("AccessToken: %s\n", accessTokenResp.AccessToken)
-	fmt.Printf("IDToken: %s\n", accessTokenResp.IDToken)
-	fmt.Printf("RefreshToken: %s\n", accessTokenResp.RefreshToken)
-	fmt.Printf("TokenType: %s\n", accessTokenResp.TokenType)
-	fmt.Printf("ExpiresIn: %d\n", accessTokenResp.ExpiresIn)
+	fmt.Printf("AccessToken: %s\n", tokenResp.AccessToken)
+	fmt.Printf("IDToken: %s\n", tokenResp.IDToken)
+	fmt.Printf("RefreshToken: %s\n", tokenResp.RefreshToken)
+	fmt.Printf("TokenType: %s\n", tokenResp.TokenType)
+	fmt.Printf("ExpiresIn: %d\n", tokenResp.ExpiresIn)
 
 	return "", nil
 }
