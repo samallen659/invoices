@@ -2,12 +2,13 @@ package transport
 
 import (
 	"encoding/gob"
-	"net/http"
-
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	"github.com/samallen659/invoices/backend/internal/auth"
 	"github.com/samallen659/invoices/backend/internal/invoice"
+	"github.com/samallen659/invoices/backend/internal/session"
 	"github.com/samallen659/invoices/backend/internal/user"
+	"net/http"
 )
 
 type Server struct {
@@ -18,13 +19,19 @@ type Server struct {
 	origins     handlers.CORSOption
 }
 
-func NewServer(invHandler *invoice.Handler, usrHandler *user.Handler) (*Server, error) {
+var authenticator *auth.Authenticator
+
+type handler func(http.ResponseWriter, *http.Request)
+
+func NewServer(invHandler *invoice.Handler, usrHandler *user.Handler, authen *auth.Authenticator) (*Server, error) {
 	router := mux.NewRouter()
+
+	authenticator = authen
 
 	router.HandleFunc("/invoice/{id}", invHandler.HandleGetByID).Methods(http.MethodGet)
 	router.HandleFunc("/invoice/{id}", invHandler.HandleUpdate).Methods(http.MethodPut)
 	router.HandleFunc("/invoice/{id}", invHandler.HandleDelete).Methods(http.MethodDelete)
-	router.HandleFunc("/invoice", invHandler.HandleGetAll).Methods(http.MethodGet)
+	router.HandleFunc("/invoice", authMiddleware(invHandler.HandleGetAll)).Methods(http.MethodGet)
 	router.HandleFunc("/invoice", invHandler.HandleStore).Methods(http.MethodPost)
 
 	router.HandleFunc("/user/login", usrHandler.HandleLogin).Methods(http.MethodGet)
@@ -49,4 +56,20 @@ func (s *Server) Serve(port string) error {
 		return err
 	}
 	return nil
+}
+
+func authMiddleware(next handler) handler {
+	return (func(w http.ResponseWriter, r *http.Request) {
+		ses, err := session.Get(r)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		if ses.Values["profile"] == nil {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+		next(w, r)
+	})
 }

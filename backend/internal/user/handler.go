@@ -1,12 +1,9 @@
 package user
 
 import (
-	// "crypto/rand"
-	// "encoding/base64"
 	"fmt"
-	"net/http"
-
 	"github.com/samallen659/invoices/backend/internal/session"
+	"net/http"
 )
 
 type Handler struct {
@@ -87,6 +84,10 @@ func (h *Handler) HandleCallback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, "http://localhost:5173", http.StatusPermanentRedirect)
+}
+
+func (h *Handler) HandleLogout(w http.ResponseWriter, r *http.Request) {
+
 }
 
 func generateRandomState() (string, error) {

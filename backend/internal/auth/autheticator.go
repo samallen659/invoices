@@ -1,9 +1,9 @@
-package user
+package auth
 
 import (
 	"context"
 	"errors"
-	// "fmt"
+	"fmt"
 	"github.com/coreos/go-oidc"
 	"golang.org/x/oauth2"
 	"os"
@@ -17,8 +17,7 @@ type Authenticator struct {
 func NewAuthenticator() (*Authenticator, error) {
 	provider, err := oidc.NewProvider(
 		context.Background(),
-		"https://cognito-idp.eu-west-2.amazonaws.com/eu-west-2_HeJpvCPvH",
-		// fmt.Sprintf(os.Getenv("COGNITO_DOMAIN")),
+		fmt.Sprintf(os.Getenv("COGNITO_OPENID_DISCOVERY_URL")),
 	)
 	if err != nil {
 		return nil, err

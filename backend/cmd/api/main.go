@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
+	"github.com/samallen659/invoices/backend/internal/auth"
 	"github.com/samallen659/invoices/backend/internal/invoice"
 	"github.com/samallen659/invoices/backend/internal/session"
 	"github.com/samallen659/invoices/backend/internal/transport"
@@ -42,7 +43,7 @@ func main() {
 	}
 
 	//User setup
-	usrAuth, err := user.NewAuthenticator()
+	usrAuth, err := auth.NewAuthenticator()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -55,7 +56,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	server, err := transport.NewServer(invHandler, usrHandler)
+	server, err := transport.NewServer(invHandler, usrHandler, usrAuth)
 	if err != nil {
 		log.Fatal(err)
 	}
