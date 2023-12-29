@@ -36,6 +36,7 @@ func NewServer(invHandler *invoice.Handler, usrHandler *user.Handler, authen *au
 
 	router.HandleFunc("/user/login", usrHandler.HandleLogin).Methods(http.MethodGet)
 	router.HandleFunc("/user/callback", usrHandler.HandleCallback).Methods(http.MethodGet)
+	router.HandleFunc("/user/logout", usrHandler.HandleLogout).Methods(http.MethodGet)
 
 	methods := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE"})
 	credentials := handlers.AllowCredentials()
@@ -65,6 +66,9 @@ func authMiddleware(next handler) handler {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+
+		// 1 week
+		ses.Options.MaxAge = 86400 * 7
 
 		if ses.Values["profile"] == nil {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)

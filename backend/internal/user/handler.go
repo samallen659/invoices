@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/samallen659/invoices/backend/internal/session"
 	"net/http"
+	"net/url"
+	"os"
 )
 
 type Handler struct {
@@ -87,7 +89,38 @@ func (h *Handler) HandleCallback(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) HandleLogout(w http.ResponseWriter, r *http.Request) {
+	ses, err := session.Get(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	ses.Options.MaxAge = -1
+	err = ses.Save(r, w)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
+	fmt.Println(ses.Options)
+
+	logoutUrl, err := url.Parse(os.Getenv("COGNITO_DOMAIN") + "/logout")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	logout_uri, err := url.Parse("http://localhost:5173")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	params := url.Values{}
+	params.Add("logout_uri", logout_uri.String())
+	params.Add("client_id", os.Getenv("COGNITO_CLIENT_ID"))
+	logoutUrl.RawQuery = params.Encode()
+
+	http.Redirect(w, r, logoutUrl.String(), http.StatusTemporaryRedirect)
 }
 
 func generateRandomState() (string, error) {
