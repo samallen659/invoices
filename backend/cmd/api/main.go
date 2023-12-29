@@ -42,7 +42,7 @@ func main() {
 	}
 
 	//User setup
-	usrAuth, err := user.NewCognitoAuthenticator()
+	usrAuth, err := user.NewAuthenticator()
 	if err != nil {
 		log.Fatal(err)
 	}

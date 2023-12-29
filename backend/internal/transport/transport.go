@@ -1,11 +1,13 @@
 package transport
 
 import (
+	"encoding/gob"
+	"net/http"
+
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/samallen659/invoices/backend/internal/invoice"
 	"github.com/samallen659/invoices/backend/internal/user"
-	"net/http"
 )
 
 type Server struct {
@@ -31,6 +33,8 @@ func NewServer(invHandler *invoice.Handler, usrHandler *user.Handler) (*Server, 
 	methods := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE"})
 	credentials := handlers.AllowCredentials()
 	origins := handlers.AllowedOrigins([]string{"localhost:5173"})
+
+	gob.Register(map[string]any{})
 
 	return &Server{
 		invHandler:  invHandler,

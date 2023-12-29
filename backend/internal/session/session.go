@@ -12,7 +12,7 @@ func New(sessionSecret string) {
 }
 
 func Get(req *http.Request) (*gssessions.Session, error) {
-	return store.Get(req, "session-name")
+	return store.Get(req, "session")
 }
 
 func GetNamed(req *http.Request, name string) (*gssessions.Session, error) {
