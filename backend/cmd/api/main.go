@@ -7,6 +7,7 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/samallen659/invoices/backend/internal/auth"
+	"github.com/samallen659/invoices/backend/internal/db"
 	"github.com/samallen659/invoices/backend/internal/invoice"
 	"github.com/samallen659/invoices/backend/internal/session"
 	"github.com/samallen659/invoices/backend/internal/transport"
@@ -28,11 +29,18 @@ func main() {
 
 	session.New(os.Getenv("SESSION_SECRET"))
 
-	//Invoice setup
-	invRepo, err := invoice.NewPostgresRespository(postgresConnStr)
+	conn, err := db.ConnectDB(postgresConnStr)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	usrAuth, err := auth.NewAuthenticator()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	//Invoice setup
+	invRepo := invoice.NewPostgresRespository(conn)
 	invSvc, err := invoice.NewService(invRepo)
 	if err != nil {
 		log.Fatal(err)
@@ -43,10 +51,6 @@ func main() {
 	}
 
 	//User setup
-	usrAuth, err := auth.NewAuthenticator()
-	if err != nil {
-		log.Fatal(err)
-	}
 	usrSvc, err := user.NewService(usrAuth)
 	if err != nil {
 		log.Fatal(err)

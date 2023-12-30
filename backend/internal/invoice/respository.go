@@ -79,12 +79,8 @@ type PostgresRepository struct {
 	conn *sqlx.DB
 }
 
-func NewPostgresRespository(connectionURI string) (*PostgresRepository, error) {
-	conn, err := sqlx.Open("postgres", connectionURI)
-	if err != nil {
-		return nil, fmt.Errorf("failed to open Postgres connection: %w", err)
-	}
-	return &PostgresRepository{conn: conn}, nil
+func NewPostgresRespository(conn *sqlx.DB) *PostgresRepository {
+	return &PostgresRepository{conn: conn}
 }
 
 func (pr *PostgresRepository) GetInvoiceByID(ctx context.Context, id uuid.UUID) (*Invoice, error) {
