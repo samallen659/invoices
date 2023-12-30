@@ -1,12 +1,17 @@
 package user
 
 import (
-	"fmt"
 	"github.com/samallen659/invoices/backend/internal/session"
+	"math/rand"
 	"net/http"
 	"net/url"
 	"os"
 )
+
+const letterBytes = "abcdefghijklmnopqrstuvmxyzADCDEFGHIJKLMNOPQRSTUVQXYZ"
+
+var cognitoDomain string
+var frontendHost string
 
 type Handler struct {
 	svc *Service
@@ -19,21 +24,14 @@ type SignUpRequest struct {
 	Password  string `json:"password"`
 }
 
-var (
-	COGNITO_DOMAIN = os.Getenv("COGNITO_DOMAIN")
-	FRONTEND_HOST  = os.Getenv("FRONTEND_HOST")
-)
-
 func NewHandler(svc *Service) (*Handler, error) {
+	cognitoDomain = os.Getenv("COGNITO_DOMAIN")
+	frontendHost = os.Getenv("FRONTEND_HOST")
 	return &Handler{svc: svc}, nil
 }
 
 func (h *Handler) HandleLogin(w http.ResponseWriter, r *http.Request) {
-	state, err := generateRandomState()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	state := generateRandomState(32)
 
 	ses, err := session.Get(r)
 	if err != nil {
@@ -60,7 +58,6 @@ func (h *Handler) HandleCallback(w http.ResponseWriter, r *http.Request) {
 	state := r.URL.Query().Get("state")
 
 	if ses.Values["state"] != state {
-		fmt.Printf("Ses State: %s Url State: %s", ses.Values["state"], state)
 		http.Error(w, "", http.StatusBadRequest)
 		return
 	}
@@ -90,7 +87,7 @@ func (h *Handler) HandleCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, FRONTEND_HOST, http.StatusPermanentRedirect)
+	http.Redirect(w, r, frontendHost, http.StatusPermanentRedirect)
 }
 
 func (h *Handler) HandleLogout(w http.ResponseWriter, r *http.Request) {
@@ -106,15 +103,13 @@ func (h *Handler) HandleLogout(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println(ses.Options)
-
-	logoutUrl, err := url.Parse(COGNITO_DOMAIN + "/logout")
+	logoutUrl, err := url.Parse(cognitoDomain + "/logout")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	logout_uri, err := url.Parse(FRONTEND_HOST)
+	logout_uri, err := url.Parse(frontendHost)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -128,14 +123,11 @@ func (h *Handler) HandleLogout(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, logoutUrl.String(), http.StatusTemporaryRedirect)
 }
 
-func generateRandomState() (string, error) {
-	// b := make([]byte, 32)
-	// _, err := rand.Read(b)
-	// if err != nil {
-	// 	return "", err
-	// }
+func generateRandomState(n int) string {
+	b := make([]byte, n)
+	for i := range b {
+		b[i] = letterBytes[rand.Intn(len(letterBytes))]
+	}
 
-	// state := base64.StdEncoding.EncodeToString(b)
-
-	return "statestring", nil
+	return string(b)
 }
