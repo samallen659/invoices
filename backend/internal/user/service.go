@@ -6,8 +6,9 @@ import (
 
 type Service struct {
 	auth *auth.Authenticator
+	repo Repository
 }
 
-func NewService(auth *auth.Authenticator) (*Service, error) {
-	return &Service{auth: auth}, nil
+func NewService(auth *auth.Authenticator, repo Repository) (*Service, error) {
+	return &Service{auth: auth, repo: repo}, nil
 }

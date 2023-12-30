@@ -51,7 +51,8 @@ func main() {
 	}
 
 	//User setup
-	usrSvc, err := user.NewService(usrAuth)
+	usrRepo := user.NewPostgresRepository(conn)
+	usrSvc, err := user.NewService(usrAuth, usrRepo)
 	if err != nil {
 		log.Fatal(err)
 	}
