@@ -28,11 +28,11 @@ func NewServer(invHandler *invoice.Handler, usrHandler *user.Handler, authen *au
 
 	authenticator = authen
 
-	router.HandleFunc("/invoice/{id}", invHandler.HandleGetByID).Methods(http.MethodGet)
-	router.HandleFunc("/invoice/{id}", invHandler.HandleUpdate).Methods(http.MethodPut)
-	router.HandleFunc("/invoice/{id}", invHandler.HandleDelete).Methods(http.MethodDelete)
+	router.HandleFunc("/invoice/{id}", authMiddleware(invHandler.HandleGetByID)).Methods(http.MethodGet)
+	router.HandleFunc("/invoice/{id}", authMiddleware(invHandler.HandleUpdate)).Methods(http.MethodPut)
+	router.HandleFunc("/invoice/{id}", authMiddleware(invHandler.HandleDelete)).Methods(http.MethodDelete)
 	router.HandleFunc("/invoice", authMiddleware(invHandler.HandleGetAll)).Methods(http.MethodGet)
-	router.HandleFunc("/invoice", invHandler.HandleStore).Methods(http.MethodPost)
+	router.HandleFunc("/invoice", authMiddleware(invHandler.HandleStore)).Methods(http.MethodPost)
 
 	router.HandleFunc("/user/login", usrHandler.HandleLogin).Methods(http.MethodGet)
 	router.HandleFunc("/user/callback", usrHandler.HandleCallback).Methods(http.MethodGet)
