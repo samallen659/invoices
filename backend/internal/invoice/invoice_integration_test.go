@@ -19,6 +19,7 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
+	"github.com/samallen659/invoices/backend/internal/db"
 	"github.com/samallen659/invoices/backend/internal/invoice"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
@@ -144,10 +145,11 @@ func (s *Server) Serve(port string) error {
 }
 
 func setupInvoiceDomain(connStr string) (*invoice.Handler, error) {
-	repo, err := invoice.NewPostgresRespository(connStr)
+	conn, err := db.ConnectDB(connStr)
 	if err != nil {
 		return nil, err
 	}
+	repo := invoice.NewPostgresRespository(conn)
 
 	svc, err := invoice.NewService(repo)
 	if err != nil {
