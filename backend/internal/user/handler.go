@@ -19,6 +19,11 @@ type SignUpRequest struct {
 	Password  string `json:"password"`
 }
 
+var (
+	COGNITO_DOMAIN = os.Getenv("COGNITO_DOMAIN")
+	FRONTEND_HOST  = os.Getenv("FRONTEND_HOST")
+)
+
 func NewHandler(svc *Service) (*Handler, error) {
 	return &Handler{svc: svc}, nil
 }
@@ -85,7 +90,7 @@ func (h *Handler) HandleCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, "http://localhost:5173", http.StatusPermanentRedirect)
+	http.Redirect(w, r, FRONTEND_HOST, http.StatusPermanentRedirect)
 }
 
 func (h *Handler) HandleLogout(w http.ResponseWriter, r *http.Request) {
@@ -103,13 +108,13 @@ func (h *Handler) HandleLogout(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println(ses.Options)
 
-	logoutUrl, err := url.Parse(os.Getenv("COGNITO_DOMAIN") + "/logout")
+	logoutUrl, err := url.Parse(COGNITO_DOMAIN + "/logout")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	logout_uri, err := url.Parse("http://localhost:5173")
+	logout_uri, err := url.Parse(FRONTEND_HOST)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
