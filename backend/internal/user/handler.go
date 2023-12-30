@@ -1,11 +1,13 @@
 package user
 
 import (
-	"github.com/samallen659/invoices/backend/internal/session"
+	// "fmt"
 	"math/rand"
 	"net/http"
 	"net/url"
 	"os"
+
+	"github.com/samallen659/invoices/backend/internal/session"
 )
 
 const letterBytes = "abcdefghijklmnopqrstuvmxyzADCDEFGHIJKLMNOPQRSTUVQXYZ"
@@ -76,6 +78,11 @@ func (h *Handler) HandleCallback(w http.ResponseWriter, r *http.Request) {
 
 	var profile map[string]any
 	if err := idToken.Claims(&profile); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	err = h.svc.ValidateLocalUser(r.Context(), profile)
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

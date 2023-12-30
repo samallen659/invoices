@@ -3,6 +3,7 @@ package user
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
@@ -40,7 +41,7 @@ func (p *PostgresRepository) GetUser(ctx context.Context, id uuid.UUID) (*User, 
 }
 
 func (p *PostgresRepository) StoreUser(ctx context.Context, user User) error {
-	err := p.conn.QueryRowx(`INSERT INTO users(id, first_name, last_name, email) VALUES ($1, $2, $3, $4)`,
+	_, err := p.conn.Queryx(`INSERT INTO users(id, first_name, last_name, email) VALUES ($1, $2, $3, $4)`,
 		user.ID, user.FirstName, user.LastName, user.Email)
 	if err != nil {
 		return errors.New("failed to insert into users")
@@ -49,7 +50,7 @@ func (p *PostgresRepository) StoreUser(ctx context.Context, user User) error {
 }
 
 func (p *PostgresRepository) DeleteUser(ctx context.Context, id uuid.UUID) error {
-	err := p.conn.QueryRowx(`DELETE FROM users WHERE id=$1`, id)
+	_, err := p.conn.Queryx(`DELETE FROM users WHERE id=$1`, id)
 	if err != nil {
 		return errors.New("failed to delete from users")
 	}
@@ -57,9 +58,10 @@ func (p *PostgresRepository) DeleteUser(ctx context.Context, id uuid.UUID) error
 }
 
 func (p *PostgresRepository) UpdateUser(ctx context.Context, user User) error {
-	err := p.conn.QueryRowx(`UPDATE users SET first_name=$2, last_name=$3, email=$4 WHERE id=$1`,
+	_, err := p.conn.Queryx(`UPDATE users SET first_name=$2, last_name=$3, email=$4 WHERE id=$1`,
 		user.ID, user.FirstName, user.LastName, user.Email)
 	if err != nil {
+		fmt.Println(err.Error())
 		return errors.New("failed to update users")
 	}
 	return nil
