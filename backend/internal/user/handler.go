@@ -1,19 +1,20 @@
 package user
 
 import (
-	// "fmt"
+	"github.com/google/uuid"
+	"github.com/samallen659/invoices/backend/internal/session"
+	"github.com/samallen659/invoices/backend/internal/utils"
 	"math/rand"
 	"net/http"
 	"net/url"
 	"os"
-
-	"github.com/samallen659/invoices/backend/internal/session"
 )
 
 const letterBytes = "abcdefghijklmnopqrstuvmxyzADCDEFGHIJKLMNOPQRSTUVQXYZ"
 
 var cognitoDomain string
 var frontendHost string
+var cognitoClientID string
 
 type Handler struct {
 	svc *Service
@@ -29,6 +30,7 @@ type SignUpRequest struct {
 func NewHandler(svc *Service) (*Handler, error) {
 	cognitoDomain = os.Getenv("COGNITO_DOMAIN")
 	frontendHost = os.Getenv("FRONTEND_HOST")
+	cognitoClientID = os.Getenv("COGNITO_CLIENT_ID")
 	return &Handler{svc: svc}, nil
 }
 
@@ -124,10 +126,37 @@ func (h *Handler) HandleLogout(w http.ResponseWriter, r *http.Request) {
 
 	params := url.Values{}
 	params.Add("logout_uri", logout_uri.String())
-	params.Add("client_id", os.Getenv("COGNITO_CLIENT_ID"))
+	params.Add("client_id", cognitoClientID)
 	logoutUrl.RawQuery = params.Encode()
 
 	http.Redirect(w, r, logoutUrl.String(), http.StatusTemporaryRedirect)
+}
+
+func (h *Handler) HandleGetUser(w http.ResponseWriter, r *http.Request) {
+	ses, err := session.Get(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if ses.Values["profile"] == nil {
+		http.Error(w, "Unable to verify user", http.StatusInternalServerError)
+		return
+	}
+	profile := ses.Values["profile"].(map[string]any)
+	idStr := profile["sub"].(string)
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	user, err := h.svc.repo.GetUser(r.Context(), id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	utils.WriteJson(w, http.StatusOK, user)
+
 }
 
 func generateRandomState(n int) string {

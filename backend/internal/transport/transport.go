@@ -23,10 +23,10 @@ var authenticator *auth.Authenticator
 
 type handler func(http.ResponseWriter, *http.Request)
 
-func NewServer(invHandler *invoice.Handler, usrHandler *user.Handler, authen *auth.Authenticator) (*Server, error) {
+func NewServer(invHandler *invoice.Handler, usrHandler *user.Handler, a *auth.Authenticator) (*Server, error) {
 	router := mux.NewRouter()
 
-	authenticator = authen
+	authenticator = a
 
 	router.HandleFunc("/invoice/{id}", authMiddleware(invHandler.HandleGetByID)).Methods(http.MethodGet)
 	router.HandleFunc("/invoice/{id}", authMiddleware(invHandler.HandleUpdate)).Methods(http.MethodPut)
@@ -37,6 +37,7 @@ func NewServer(invHandler *invoice.Handler, usrHandler *user.Handler, authen *au
 	router.HandleFunc("/user/login", usrHandler.HandleLogin).Methods(http.MethodGet)
 	router.HandleFunc("/user/callback", usrHandler.HandleCallback).Methods(http.MethodGet)
 	router.HandleFunc("/user/logout", usrHandler.HandleLogout).Methods(http.MethodGet)
+	router.HandleFunc("/user", authMiddleware(usrHandler.HandleGetUser)).Methods(http.MethodGet)
 
 	methods := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE"})
 	credentials := handlers.AllowCredentials()
