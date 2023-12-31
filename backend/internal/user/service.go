@@ -61,3 +61,12 @@ func (s *Service) GetUser(ctx context.Context, id uuid.UUID) (*User, error) {
 
 	return user, nil
 }
+
+func (s *Service) DeleteUser(ctx context.Context, id uuid.UUID) error {
+	err := s.repo.DeleteUser(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
