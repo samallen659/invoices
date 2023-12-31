@@ -10,10 +10,10 @@ type User struct {
 	FirstName string
 	LastName  string
 	Email     string
-	// UserName  string
+	UserName  string
 }
 
-func NewUser(id uuid.UUID, firstName string, lastName string, email string) (*User, error) {
+func NewUser(id uuid.UUID, firstName string, lastName string, email string, userName string) (*User, error) {
 	if firstName == "" {
 		return nil, errors.New("firstName cannot be empty")
 	}
@@ -23,15 +23,15 @@ func NewUser(id uuid.UUID, firstName string, lastName string, email string) (*Us
 	if email == "" {
 		return nil, errors.New("email cannot be empty")
 	}
-	// if userName == "" {
-	// 	return nil, errors.New("userName cannot by empty")
-	// }
+	if userName == "" {
+		return nil, errors.New("userName cannot by empty")
+	}
 
 	return &User{
 		ID:        id,
 		FirstName: firstName,
 		LastName:  lastName,
 		Email:     email,
-		// UserName:  userName,
+		UserName:  userName,
 	}, nil
 }

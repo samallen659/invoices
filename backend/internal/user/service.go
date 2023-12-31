@@ -19,7 +19,7 @@ func (s *Service) ValidateLocalUser(ctx context.Context, profile map[string]any)
 	firstName := profile["given_name"].(string)
 	lastName := profile["family_name"].(string)
 	email := profile["email"].(string)
-	// userName := profile["cognito:username"].(string)
+	userName := profile["cognito:username"].(string)
 	idStr := profile["sub"].(string)
 	id, err := uuid.Parse(idStr)
 	if err != nil {
@@ -29,7 +29,7 @@ func (s *Service) ValidateLocalUser(ctx context.Context, profile map[string]any)
 	user, err := s.repo.GetUser(ctx, id)
 	if err != nil {
 		if err.Error() == "No User found with supplied id" {
-			newUser, err := NewUser(id, firstName, lastName, email)
+			newUser, err := NewUser(id, firstName, lastName, email, userName)
 			if err != nil {
 				return err
 			}
@@ -40,14 +40,24 @@ func (s *Service) ValidateLocalUser(ctx context.Context, profile map[string]any)
 		}
 	}
 
-	if user.FirstName != firstName || user.LastName != lastName || user.Email != email {
+	if user.FirstName != firstName || user.LastName != lastName || user.Email != email || user.UserName != userName {
 		user.FirstName = firstName
 		user.LastName = lastName
 		user.Email = email
+		user.UserName = userName
 		err = s.repo.UpdateUser(ctx, *user)
 		if err != nil {
 			return err
 		}
 	}
 	return nil
+}
+
+func (s *Service) GetUser(ctx context.Context, id uuid.UUID) (*User, error) {
+	user, err := s.repo.GetUser(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }
