@@ -2,6 +2,8 @@ package user
 
 import (
 	"context"
+	"errors"
+
 	"github.com/google/uuid"
 	"github.com/samallen659/invoices/backend/internal/auth"
 )
@@ -16,11 +18,31 @@ func NewService(auth *auth.Authenticator, repo Repository) (*Service, error) {
 }
 
 func (s *Service) ValidateLocalUser(ctx context.Context, profile map[string]any) error {
-	firstName := profile["given_name"].(string)
-	lastName := profile["family_name"].(string)
-	email := profile["email"].(string)
-	userName := profile["cognito:username"].(string)
-	idStr := profile["sub"].(string)
+	var (
+		idStr     string
+		firstName string
+		lastName  string
+		email     string
+		userName  string
+	)
+	var ok bool
+
+	if firstName, ok = profile["given_name"].(string); !ok {
+		return errors.New("Unable to validate given_name in profile")
+	}
+	if lastName, ok = profile["family_name"].(string); !ok {
+		return errors.New("Unable to validate family_name in profile")
+	}
+	if email, ok = profile["email"].(string); !ok {
+		return errors.New("Unable to validate email in profile")
+	}
+	if userName, ok = profile["cognito:username"].(string); !ok {
+		return errors.New("Unable to validate cognito:username in profile")
+	}
+	if idStr, ok = profile["sub"].(string); !ok {
+		return errors.New("Unable to validate sub in profile")
+	}
+
 	id, err := uuid.Parse(idStr)
 	if err != nil {
 		return err
