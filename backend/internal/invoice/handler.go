@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
+	"github.com/samallen659/invoices/backend/internal/utils"
 	"net/http"
 	"time"
 )
@@ -56,43 +57,43 @@ func (h *Handler) HandleGetByID(w http.ResponseWriter, r *http.Request) {
 
 	uid, err := uuid.Parse(id)
 	if err != nil {
-		h.writeJson(w, http.StatusBadRequest, ErrorResponse{Error: err.Error()})
+		utils.WriteJson(w, http.StatusBadRequest, ErrorResponse{Error: err.Error()})
 		return
 	}
 
 	inv, err := h.svc.GetByID(r.Context(), uid)
 	if err != nil {
-		h.writeJson(w, http.StatusBadRequest, ErrorResponse{Error: err.Error()})
+		utils.WriteJson(w, http.StatusBadRequest, ErrorResponse{Error: err.Error()})
 		return
 	}
 
-	h.writeJson(w, http.StatusOK, InvoiceResponse{Invoice: []*Invoice{inv}})
+	utils.WriteJson(w, http.StatusOK, InvoiceResponse{Invoice: []*Invoice{inv}})
 }
 
 func (h *Handler) HandleGetAll(w http.ResponseWriter, r *http.Request) {
 	inv, err := h.svc.GetAll(r.Context())
 	if err != nil {
-		h.writeJson(w, http.StatusBadRequest, ErrorResponse{Error: err.Error()})
+		utils.WriteJson(w, http.StatusBadRequest, ErrorResponse{Error: err.Error()})
 		return
 	}
 
-	h.writeJson(w, http.StatusOK, InvoiceResponse{Invoice: inv})
+	utils.WriteJson(w, http.StatusOK, InvoiceResponse{Invoice: inv})
 }
 
 func (h *Handler) HandleStore(w http.ResponseWriter, r *http.Request) {
 	var ir InvoiceRequest
 	if err := json.NewDecoder(r.Body).Decode(&ir); err != nil {
-		h.writeJson(w, http.StatusBadRequest, ErrorResponse{Error: err.Error()})
+		utils.WriteJson(w, http.StatusBadRequest, ErrorResponse{Error: err.Error()})
 		return
 	}
 
 	inv, err := h.svc.NewInvoice(r.Context(), ir)
 	if err != nil {
-		h.writeJson(w, http.StatusBadRequest, ErrorResponse{Error: err.Error()})
+		utils.WriteJson(w, http.StatusBadRequest, ErrorResponse{Error: err.Error()})
 		return
 	}
 
-	h.writeJson(w, http.StatusOK, InvoiceResponse{Invoice: []*Invoice{inv}})
+	utils.WriteJson(w, http.StatusOK, InvoiceResponse{Invoice: []*Invoice{inv}})
 }
 
 func (h *Handler) HandleUpdate(w http.ResponseWriter, r *http.Request) {
@@ -100,23 +101,23 @@ func (h *Handler) HandleUpdate(w http.ResponseWriter, r *http.Request) {
 
 	uid, err := uuid.Parse(id)
 	if err != nil {
-		h.writeJson(w, http.StatusBadRequest, ErrorResponse{Error: err.Error()})
+		utils.WriteJson(w, http.StatusBadRequest, ErrorResponse{Error: err.Error()})
 		return
 	}
 
 	var ir InvoiceRequest
 	if err = json.NewDecoder(r.Body).Decode(&ir); err != nil {
-		h.writeJson(w, http.StatusBadRequest, ErrorResponse{Error: err.Error()})
+		utils.WriteJson(w, http.StatusBadRequest, ErrorResponse{Error: err.Error()})
 		return
 	}
 
 	inv, err := h.svc.UpdateInvoice(r.Context(), uid, ir)
 	if err != nil {
-		h.writeJson(w, http.StatusBadRequest, ErrorResponse{Error: err.Error()})
+		utils.WriteJson(w, http.StatusBadRequest, ErrorResponse{Error: err.Error()})
 		return
 	}
 
-	h.writeJson(w, http.StatusOK, InvoiceResponse{Invoice: []*Invoice{inv}})
+	utils.WriteJson(w, http.StatusOK, InvoiceResponse{Invoice: []*Invoice{inv}})
 }
 
 func (h *Handler) HandleDelete(w http.ResponseWriter, r *http.Request) {
@@ -124,20 +125,14 @@ func (h *Handler) HandleDelete(w http.ResponseWriter, r *http.Request) {
 
 	uid, err := uuid.Parse(id)
 	if err != nil {
-		h.writeJson(w, http.StatusBadRequest, ErrorResponse{Error: err.Error()})
+		utils.WriteJson(w, http.StatusBadRequest, ErrorResponse{Error: err.Error()})
 		return
 	}
 
 	if err = h.svc.DeleteInvoice(r.Context(), uid); err != nil {
-		h.writeJson(w, http.StatusBadRequest, ErrorResponse{Error: err.Error()})
+		utils.WriteJson(w, http.StatusBadRequest, ErrorResponse{Error: err.Error()})
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
-}
-
-func (h *Handler) writeJson(w http.ResponseWriter, status int, data any) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(status)
-	json.NewEncoder(w).Encode(data)
 }
