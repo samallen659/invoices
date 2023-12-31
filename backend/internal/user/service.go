@@ -3,7 +3,6 @@ package user
 import (
 	"context"
 	"errors"
-
 	"github.com/google/uuid"
 	"github.com/samallen659/invoices/backend/internal/auth"
 )
@@ -56,18 +55,18 @@ func (s *Service) ValidateLocalUser(ctx context.Context, profile map[string]any)
 				return err
 			}
 			err = s.repo.StoreUser(ctx, *newUser)
+			if err != nil {
+				return err
+			}
+			return nil
 		} else {
-
 			return err
 		}
 	}
 
 	if user.FirstName != firstName || user.LastName != lastName || user.Email != email || user.UserName != userName {
-		user.FirstName = firstName
-		user.LastName = lastName
-		user.Email = email
-		user.UserName = userName
-		err = s.repo.UpdateUser(ctx, *user)
+		updatedUser, err := NewUser(id, firstName, lastName, email, userName)
+		err = s.repo.UpdateUser(ctx, *updatedUser)
 		if err != nil {
 			return err
 		}

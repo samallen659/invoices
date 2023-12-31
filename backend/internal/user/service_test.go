@@ -14,16 +14,17 @@ type RepoStub struct {
 }
 
 func (rs *RepoStub) GetUser(ctx context.Context, id uuid.UUID) (*u.User, error) {
-	for _, u := range rs.users {
-		if u.ID.String() == id.String() {
-			return u, nil
+	for _, usr := range rs.users {
+		if usr.ID.String() == id.String() {
+			return usr, nil
 		}
 	}
 
-	return nil, errors.New("No user found with supplied id")
+	return nil, errors.New("No User found with supplied id")
 }
 
 func (rs *RepoStub) StoreUser(ctx context.Context, user u.User) error {
+	rs.users = append(rs.users, &user)
 	return nil
 }
 
@@ -32,7 +33,17 @@ func (rs *RepoStub) DeleteUser(ctx context.Context, id uuid.UUID) error {
 }
 
 func (rs *RepoStub) UpdateUser(ctx context.Context, user u.User) error {
-	return nil
+	for _, usr := range rs.users {
+		if usr.ID.String() == user.ID.String() {
+			usr.FirstName = user.FirstName
+			usr.LastName = user.LastName
+			usr.Email = user.Email
+			usr.UserName = user.UserName
+			return nil
+		}
+	}
+
+	return errors.New("failed to update users")
 }
 
 func TestService(t *testing.T) {
@@ -82,9 +93,9 @@ func TestService(t *testing.T) {
 		}{
 			{
 				profile: map[string]any{
-					"given_name":  "testFirst",
-					"family_name": "testLast",
-					"email":       "test@email.com",
+					"given_name":  firstName,
+					"family_name": lastName,
+					"email":       email,
 					"sub":         id.String(),
 				},
 				err: "Expected error for invalid cognito:username in profile",
@@ -92,8 +103,8 @@ func TestService(t *testing.T) {
 			{
 				profile: map[string]any{
 					"cognito:username": "testUser",
-					"family_name":      "testLast",
-					"email":            "test@email.com",
+					"family_name":      lastName,
+					"email":            email,
 					"sub":              id.String(),
 				},
 				err: "Expected error for invalid given_name in profile",
@@ -101,8 +112,8 @@ func TestService(t *testing.T) {
 			{
 				profile: map[string]any{
 					"cognito:username": "testUser",
-					"given_name":       "testFirst",
-					"email":            "test@email.com",
+					"given_name":       firstName,
+					"email":            email,
 					"sub":              id.String(),
 				},
 				err: "Expected error for invalid family_name in profile",
@@ -110,8 +121,8 @@ func TestService(t *testing.T) {
 			{
 				profile: map[string]any{
 					"cognito:username": "testUser",
-					"given_name":       "testFirst",
-					"family_name":      "testLast",
+					"given_name":       firstName,
+					"family_name":      lastName,
 					"sub":              id.String(),
 				},
 				err: "Expected error for invalid email in profile",
@@ -119,18 +130,18 @@ func TestService(t *testing.T) {
 			{
 				profile: map[string]any{
 					"cognito:username": "testUser",
-					"given_name":       "testFirst",
-					"family_name":      "testLast",
-					"email":            "test@email.com",
+					"given_name":       firstName,
+					"family_name":      lastName,
+					"email":            email,
 				},
 				err: "Expected error for invalid sub in profile",
 			},
 			{
 				profile: map[string]any{
 					"cognito:username": "testUser",
-					"given_name":       "testFirst",
-					"family_name":      "testLast",
-					"email":            "test@email.com",
+					"given_name":       firstName,
+					"family_name":      lastName,
+					"email":            email,
 					"sub":              "invalid id",
 				},
 				err: "Expected error for invalid sub in profile",
@@ -145,5 +156,65 @@ func TestService(t *testing.T) {
 			}
 		}
 	})
+	t.Run("ValidateLocalUser return nil error if user currently in repository", func(t *testing.T) {
+		profile := map[string]any{
+			"cognito:username": userName,
+			"given_name":       firstName,
+			"family_name":      lastName,
+			"email":            email,
+			"sub":              id.String(),
+		}
+		ctx := context.Background()
+		err := s.ValidateLocalUser(ctx, profile)
+		if err != nil {
+			t.Errorf("Received error when none expected: %s", err.Error())
+		}
+	})
+	t.Run("ValidateLocalUser Updates user if found but fields differ", func(t *testing.T) {
+		userName, firstName, lastName, email := "diffUser", "diffFirst", "diffLast", "diff@email.com"
+		profile := map[string]any{
+			"cognito:username": userName,
+			"given_name":       firstName,
+			"family_name":      lastName,
+			"email":            email,
+			"sub":              id.String(),
+		}
+		ctx := context.Background()
+		err := s.ValidateLocalUser(ctx, profile)
+		if err != nil {
+			t.Errorf("Received error when none expected: %s", err.Error())
+		}
 
+		usr, _ := rs.GetUser(ctx, id)
+
+		if usr.FirstName != firstName || usr.LastName != lastName || usr.Email != email || usr.UserName != userName {
+			t.Error("Returned user details have not been updated")
+		}
+
+	})
+	t.Run("ValidateLocalUser stores user if not currently in repository", func(t *testing.T) {
+		id, _ := uuid.NewRandom()
+		userName, firstName, lastName, email := "newUser", "newFirst", "newLast", "new@email.com"
+		profile := map[string]any{
+			"cognito:username": userName,
+			"given_name":       firstName,
+			"family_name":      lastName,
+			"email":            email,
+			"sub":              id.String(),
+		}
+		ctx := context.Background()
+		err := s.ValidateLocalUser(ctx, profile)
+		if err != nil {
+			t.Fatalf("Received error when none expected: %s", err.Error())
+		}
+
+		usr, _ := rs.GetUser(ctx, id)
+		if usr == nil {
+			t.Fatal("New User not stored by repo")
+		}
+
+		if usr.FirstName != firstName || usr.LastName != lastName || usr.Email != email || usr.UserName != userName {
+			t.Error("New User store with incorrect fields")
+		}
+	})
 }
