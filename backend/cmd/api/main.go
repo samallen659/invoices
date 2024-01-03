@@ -2,9 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
-	"os"
-
 	"github.com/joho/godotenv"
 	"github.com/samallen659/invoices/backend/internal/auth"
 	"github.com/samallen659/invoices/backend/internal/db"
@@ -12,6 +9,8 @@ import (
 	"github.com/samallen659/invoices/backend/internal/session"
 	"github.com/samallen659/invoices/backend/internal/transport"
 	"github.com/samallen659/invoices/backend/internal/user"
+	"log"
+	"os"
 )
 
 func main() {
