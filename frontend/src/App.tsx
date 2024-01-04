@@ -139,9 +139,16 @@ function App() {
 							)}
 						</>
 					) : (
-						<>
-							<h2 className="mx-auto">not authed</h2>
-						</>
+						<div className="mx-auto my-auto">
+							<p className="mb-4 text-lg text-indigo-800 dark:text-white">
+								To access Invoices application please log in
+							</p>
+							<a href="http://localhost:8080/user/login">
+								<div className="rounded-md bg-purple-600 p-4 text-center text-2xl text-white">
+									Log In
+								</div>
+							</a>
+						</div>
 					)}
 				</>
 			</main>
