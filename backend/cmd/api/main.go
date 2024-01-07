@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/joho/godotenv"
 	"github.com/samallen659/invoices/backend/internal/auth"
 	"github.com/samallen659/invoices/backend/internal/db"
 	"github.com/samallen659/invoices/backend/internal/invoice"
@@ -14,11 +13,6 @@ import (
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-
 	postgresUser := os.Getenv("POSTGRES_USER")
 	postgresPass := os.Getenv("POSTGRES_PASSWORD")
 	postgresDB := os.Getenv("POSTGRES_DB")
