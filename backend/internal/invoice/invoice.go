@@ -1,3 +1,8 @@
+// Package invoice contains the bounded context for invoices
+//
+// The invoice package is setup in a layed architecture,
+// hanlder layer, service layer, business logic layer, repository layer
+
 package invoice
 
 import (
@@ -93,24 +98,28 @@ func (i *Invoice) SetInvoiceItems(invoiceItems []InvoiceItem) error {
 	return nil
 }
 
+// Sets Invoice clientAddress
 func (i *Invoice) SetClientAddress(addr Address) error {
 	i.ClientAddress = addr
 
 	return nil
 }
 
+// Sets Invoice senderAddress
 func (i *Invoice) SetSenderAddress(addr Address) error {
 	i.SenderAddress = addr
 
 	return nil
 }
 
+// Sets Invoice Client
 func (i *Invoice) SetClient(client Client) error {
 	i.Client = client
 
 	return nil
 }
 
+// Sets the total value of the invoice based on the invoiceItems currently set
 func (i *Invoice) updateTotal() {
 	newTotal := 0.0
 	for _, invItem := range i.InvoiceItems {
