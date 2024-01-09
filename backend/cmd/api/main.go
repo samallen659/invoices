@@ -16,9 +16,10 @@ func main() {
 	postgresUser := os.Getenv("POSTGRES_USER")
 	postgresPass := os.Getenv("POSTGRES_PASSWORD")
 	postgresDB := os.Getenv("POSTGRES_DB")
+	postgresHost := os.Getenv("POSTGRES_HOST")
 
-	postgresConnStr := fmt.Sprintf("user=%s dbname=%s sslmode=disable password=%s host=localhost",
-		postgresUser, postgresDB, postgresPass)
+	postgresConnStr := fmt.Sprintf("user=%s dbname=%s sslmode=disable password=%s host=%s",
+		postgresUser, postgresDB, postgresPass, postgresHost)
 
 	session.New(os.Getenv("SESSION_SECRET"))
 
