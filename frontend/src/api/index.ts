@@ -1,11 +1,13 @@
 import { Invoice, InvoiceItem, InvoiceRes, Item } from "../types";
 
+const ENV = import.meta.env.VITE_ENVIRONMENT;
+const apiBaseURL = ENV === "PROD" ? import.meta.env.VITE_API_BASE_URL : "";
+
 async function getAllInvoices(): Promise<Invoice[]> {
-	const response = await fetch("/invoice", {
+	const response = await fetch(`${apiBaseURL}/invoice`, {
 		method: "GET",
 		headers: {
 			"Content-Type": "application/json",
-			"Access-Control-Allow-Origin": "http://localhost:8080/invoice",
 		},
 	});
 
@@ -21,11 +23,8 @@ async function getAllInvoices(): Promise<Invoice[]> {
 }
 
 async function deleteInvoice(id: string) {
-	const response = await fetch(`/invoice/${id}`, {
+	const response = await fetch(`${apiBaseURL}/invoice/${id}`, {
 		method: "DELETE",
-		headers: {
-			"Access-Control-Allow-Origin": "http://localhost:8080/invoice",
-		},
 	});
 
 	if (!response.ok) {
@@ -35,11 +34,10 @@ async function deleteInvoice(id: string) {
 }
 
 async function newInvoice(i: Invoice) {
-	const response = await fetch("/invoice", {
+	const response = await fetch(`${apiBaseURL}/invoice`, {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
-			"Access-Control-Allow-Origin": "http://localhost:8080/invoice",
 		},
 		body: JSON.stringify(i),
 	});
@@ -51,11 +49,10 @@ async function newInvoice(i: Invoice) {
 }
 
 async function editInvoice(i: Invoice) {
-	const response = await fetch(`/invoice/${i.ID}`, {
+	const response = await fetch(`${apiBaseURL}/invoice/${i.ID}`, {
 		method: "PUT",
 		headers: {
 			"Content-Type": "application/json",
-			"Access-Control-Allow-Origin": "http://localhost:8080/invoice",
 		},
 		body: JSON.stringify(i),
 	});
