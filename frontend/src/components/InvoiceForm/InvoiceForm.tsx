@@ -133,10 +133,6 @@ function InvoiceForm({ state, invoice, toggle }: InvoiceFormProps) {
 		toggle(false);
 	};
 
-	useEffect(() => {
-		console.log(errors);
-	}, [errors]);
-
 	return (
 		<section className="relative  mt-[80px] h-screen overflow-y-auto overflow-x-hidden overscroll-contain p-8 md:p-14 lg:ml-[103px] lg:mt-0">
 			{!newMutation.isLoading ? (
