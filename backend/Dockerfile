@@ -7,7 +7,7 @@ COPY . .
 
 RUN go mod download
 
-EXPOSE 8080
+EXPOSE 80
 
 RUN go build -o /api ./cmd/api
 
@@ -18,6 +18,6 @@ WORKDIR /
 
 COPY --from=BUILDER /api /api
 
-EXPOSE 8080
+EXPOSE 80
 
 ENTRYPOINT ["/api"]
