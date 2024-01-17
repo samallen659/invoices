@@ -13,12 +13,12 @@ FROM node:20-alpine3.19 as PRODUCTION_IMAGE
 WORKDIR /app/react-app
 
 COPY --from=BUILD_IMAGE /app/react-app/dist /app/react-app/dist/
-EXPOSE 5173
+EXPOSE 80
 
 COPY package.json .
 COPY vite.config.ts .
 
 RUN npm install typescript
 
-EXPOSE 5173
+EXPOSE 80
 CMD ["npm","run","preview"]
