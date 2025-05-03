@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/google/uuid"
 	"golang.org/x/crypto/argon2"
 )
 
@@ -21,15 +20,14 @@ const (
 )
 
 type User struct {
-	ID        uuid.UUID `json:"id"`
-	FirstName string    `json:"firstName"`
-	LastName  string    `json:"lastName"`
-	Email     string    `json:"email"`
-	UserName  string    `json:"userName"`
-	Password  string    `json:"password"`
+	UserName  string `json:"userName"`
+	FirstName string `json:"firstName"`
+	LastName  string `json:"lastName"`
+	Email     string `json:"email"`
+	Password  string `json:"password"`
 }
 
-func NewUser(id uuid.UUID, firstName string, lastName string, email string, userName string, password string) (*User, error) {
+func NewUser(userName string, firstName string, lastName string, email string, password string) (*User, error) {
 	if firstName == "" {
 		return nil, errors.New("firstName cannot be empty")
 	}
@@ -44,11 +42,10 @@ func NewUser(id uuid.UUID, firstName string, lastName string, email string, user
 	}
 
 	user := &User{
-		ID:        id,
+		UserName:  userName,
 		FirstName: firstName,
 		LastName:  lastName,
 		Email:     email,
-		UserName:  userName,
 	}
 
 	password, err := user.HashPassword(password)

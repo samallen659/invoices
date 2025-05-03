@@ -40,10 +40,9 @@ CREATE TABLE invoice_item (
 );
 
 CREATE TABLE users (
-	id UUID PRIMARY KEY,
+    user_name TEXT PRIMARY KEY,
 	first_name TEXT NOT NULL,
 	last_name TEXT NOT NULL,
-	email TEXT NOT NULL,
-    user_name TEXT NOT NULL,
+	email TEXT NOT NULL UNIQUE,
     password TEXT NOT NULL
 );
