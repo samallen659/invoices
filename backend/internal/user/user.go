@@ -43,13 +43,21 @@ func NewUser(id uuid.UUID, firstName string, lastName string, email string, user
 		return nil, errors.New("userName cannot by empty")
 	}
 
-	return &User{
+	user := &User{
 		ID:        id,
 		FirstName: firstName,
 		LastName:  lastName,
 		Email:     email,
 		UserName:  userName,
-	}, nil
+	}
+
+	password, err := user.HashPassword(password)
+	if err != nil {
+		return nil, err
+	}
+	user.Password = password
+
+	return user, nil
 }
 
 func (u *User) HashPassword(password string) (string, error) {
