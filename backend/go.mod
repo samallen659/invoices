@@ -1,6 +1,8 @@
 module github.com/samallen659/invoices/backend
 
-go 1.21.0
+go 1.23.0
+
+toolchain go1.23.8
 
 require (
 	github.com/coreos/go-oidc v2.2.1+incompatible
@@ -10,11 +12,11 @@ require (
 	github.com/gorilla/mux v1.8.1
 	github.com/gorilla/sessions v1.2.2
 	github.com/jmoiron/sqlx v1.3.5
-	github.com/joho/godotenv v1.5.1
 	github.com/lib/pq v1.10.9
 	github.com/testcontainers/testcontainers-go v0.27.0
 	github.com/testcontainers/testcontainers-go/modules/postgres v0.26.0
-	golang.org/x/net v0.19.0
+	golang.org/x/crypto v0.37.0
+	golang.org/x/net v0.21.0
 	golang.org/x/oauth2 v0.10.0
 )
 
@@ -57,10 +59,9 @@ require (
 	github.com/tklauser/numcpus v0.6.1 // indirect
 	github.com/yusufpapurcu/wmi v1.2.3 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
-	golang.org/x/crypto v0.16.0 // indirect
 	golang.org/x/exp v0.0.0-20230510235704-dd950f8aeaea // indirect
 	golang.org/x/mod v0.12.0 // indirect
-	golang.org/x/sys v0.15.0 // indirect
+	golang.org/x/sys v0.32.0 // indirect
 	golang.org/x/tools v0.10.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230711160842-782d3b101e98 // indirect
