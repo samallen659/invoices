@@ -1,20 +1,23 @@
 package user
 
 import (
-	"github.com/google/uuid"
-	"github.com/samallen659/invoices/backend/internal/session"
-	"github.com/samallen659/invoices/backend/internal/utils"
 	"math/rand"
 	"net/http"
 	"net/url"
 	"os"
+
+	"github.com/google/uuid"
+	"github.com/samallen659/invoices/backend/internal/session"
+	"github.com/samallen659/invoices/backend/internal/utils"
 )
 
 const letterBytes = "abcdefghijklmnopqrstuvmxyzADCDEFGHIJKLMNOPQRSTUVQXYZ"
 
-var cognitoDomain string
-var frontendHost string
-var cognitoClientID string
+var (
+	cognitoDomain   string
+	frontendHost    string
+	cognitoClientID string
+)
 
 type Handler struct {
 	svc *Service
@@ -25,6 +28,11 @@ type SignUpRequest struct {
 	LastName  string `json:"lastName"`
 	Email     string `json:"email"`
 	Password  string `json:"password"`
+}
+
+type LoginRequest struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 func NewHandler(svc *Service) (*Handler, error) {
@@ -156,7 +164,6 @@ func (h *Handler) HandleGetUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.WriteJson(w, http.StatusOK, user)
-
 }
 
 func generateRandomState(n int) string {
