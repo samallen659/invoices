@@ -2,13 +2,13 @@ package transport
 
 import (
 	"encoding/gob"
+	"net/http"
+
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/samallen659/invoices/backend/internal/auth"
 	"github.com/samallen659/invoices/backend/internal/invoice"
-	"github.com/samallen659/invoices/backend/internal/session"
 	"github.com/samallen659/invoices/backend/internal/user"
-	"net/http"
 )
 
 type Server struct {
@@ -28,16 +28,14 @@ func NewServer(invHandler *invoice.Handler, usrHandler *user.Handler, a *auth.Au
 
 	authenticator = a
 
-	router.HandleFunc("/invoice/{id}", authMiddleware(invHandler.HandleGetByID)).Methods(http.MethodGet)
-	router.HandleFunc("/invoice/{id}", authMiddleware(invHandler.HandleUpdate)).Methods(http.MethodPut)
-	router.HandleFunc("/invoice/{id}", authMiddleware(invHandler.HandleDelete)).Methods(http.MethodDelete)
-	router.HandleFunc("/invoice", authMiddleware(invHandler.HandleGetAll)).Methods(http.MethodGet)
-	router.HandleFunc("/invoice", authMiddleware(invHandler.HandleStore)).Methods(http.MethodPost)
+	router.HandleFunc("/invoice/{id}", user.JwtMiddleware(invHandler.HandleGetByID)).Methods(http.MethodGet)
+	router.HandleFunc("/invoice/{id}", user.JwtMiddleware(invHandler.HandleUpdate)).Methods(http.MethodPut)
+	router.HandleFunc("/invoice/{id}", user.JwtMiddleware(invHandler.HandleDelete)).Methods(http.MethodDelete)
+	router.HandleFunc("/invoice", user.JwtMiddleware(invHandler.HandleGetAll)).Methods(http.MethodGet)
+	router.HandleFunc("/invoice", user.JwtMiddleware(invHandler.HandleStore)).Methods(http.MethodPost)
 
 	router.HandleFunc("/user/login", usrHandler.HandleLogin).Methods(http.MethodGet)
-	router.HandleFunc("/user/callback", usrHandler.HandleCallback).Methods(http.MethodGet)
-	router.HandleFunc("/user/logout", usrHandler.HandleLogout).Methods(http.MethodGet)
-	router.HandleFunc("/user", authMiddleware(usrHandler.HandleGetUser)).Methods(http.MethodGet)
+	router.HandleFunc("/user", user.JwtMiddleware(usrHandler.HandleGetUser)).Methods(http.MethodGet)
 
 	methods := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE"})
 	credentials := handlers.AllowCredentials()
@@ -50,7 +48,8 @@ func NewServer(invHandler *invoice.Handler, usrHandler *user.Handler, a *auth.Au
 		Router:      router,
 		methods:     methods,
 		credentials: credentials,
-		origins:     origins}, nil
+		origins:     origins,
+	}, nil
 }
 
 func (s *Server) Serve(port string) error {
@@ -58,23 +57,4 @@ func (s *Server) Serve(port string) error {
 		return err
 	}
 	return nil
-}
-
-func authMiddleware(next handler) handler {
-	return (func(w http.ResponseWriter, r *http.Request) {
-		ses, err := session.Get(r)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		// 1 week
-		ses.Options.MaxAge = 86400 * 7
-
-		if ses.Values["profile"] == nil {
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
-			return
-		}
-		next(w, r)
-	})
 }
