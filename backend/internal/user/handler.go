@@ -24,6 +24,7 @@ type Handler struct {
 }
 
 type SignUpRequest struct {
+	UserName  string `json:"userName"`
 	FirstName string `json:"firstName"`
 	LastName  string `json:"lastName"`
 	Email     string `json:"email"`
@@ -31,6 +32,7 @@ type SignUpRequest struct {
 }
 
 type LoginRequest struct {
+	UserName string `json:"userName"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
