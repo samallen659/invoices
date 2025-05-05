@@ -34,7 +34,7 @@ func jwtMiddleware(next http.Handler) http.Handler {
 
 		token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (any, error) {
 			return jwtKey, nil
-		})
+		}, jwt.WithValidMethods([]string{"HS256"}))
 
 		if err != nil || !token.Valid {
 			http.Error(w, "Invalid token", http.StatusUnauthorized)
