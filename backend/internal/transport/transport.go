@@ -6,7 +6,6 @@ import (
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
-	"github.com/samallen659/invoices/backend/internal/auth"
 	"github.com/samallen659/invoices/backend/internal/invoice"
 	"github.com/samallen659/invoices/backend/internal/user"
 )
@@ -18,8 +17,6 @@ type Server struct {
 	credentials handlers.CORSOption
 	origins     handlers.CORSOption
 }
-
-var authenticator *auth.Authenticator
 
 type handler func(http.ResponseWriter, *http.Request)
 
