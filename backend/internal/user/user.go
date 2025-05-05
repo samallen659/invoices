@@ -48,7 +48,7 @@ func NewUser(userName string, firstName string, lastName string, email string, p
 		Email:     email,
 	}
 
-	password, err := user.HashPassword(password)
+	password, err := HashPassword(password)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func NewUser(userName string, firstName string, lastName string, email string, p
 	return user, nil
 }
 
-func (u *User) HashPassword(password string) (string, error) {
+func HashPassword(password string) (string, error) {
 	salt, err := GenerateSalt()
 	if err != nil {
 		return "", err
@@ -72,7 +72,7 @@ func (u *User) HashPassword(password string) (string, error) {
 	return encodedHash, nil
 }
 
-func (u *User) VerifyPassword(password string, encodedHash string) (bool, error) {
+func VerifyPassword(password string, encodedHash string) (bool, error) {
 	parts := strings.Split(encodedHash, "$")
 	if len(parts) != 6 {
 		return false, errors.New("Invalid hash format")
