@@ -11,7 +11,8 @@ import (
 )
 
 type Repository interface {
-	GetUser(ctx context.Context, email string, userName string) (*User, error)
+	GetUserWithUsername(ctx context.Context, userName string) (*User, error)
+	GetUserWithEmail(ctx context.Context, email string) (*User, error)
 	StoreUser(ctx context.Context, user User) error
 	DeleteUser(ctx context.Context, userName string) error
 	UpdateUser(ctx context.Context, user User) error
@@ -25,21 +26,26 @@ func NewPostgresRepository(conn *sqlx.DB) *PostgresRepository {
 	return &PostgresRepository{conn: conn}
 }
 
-func (p *PostgresRepository) GetUser(ctx context.Context, email string, userName string) (*User, error) {
+func (p *PostgresRepository) GetUserWithUsername(ctx context.Context, userName string) (*User, error) {
 	var user User
-	var err error
-	if userName != "" {
-		err = p.conn.QueryRowx(`SELECT user_name, first_name, last_name, email, password FROM users WHERE user_name=$1`,
-			userName).Scan(&user.UserName, &user.FirstName, &user.LastName, &user.Email, &user.Password)
-		if err == sql.ErrNoRows {
-			return nil, errors.New("No User found with supplied username")
-		}
-	} else {
-		err = p.conn.QueryRowx(`SELECT user_name, first_name, last_name, email, password FROM users WHERE email=$1`,
-			email).Scan(&user.UserName, &user.FirstName, &user.LastName, &user.Email, &user.Password)
-		if err == sql.ErrNoRows {
-			return nil, errors.New("No User found with supplied email")
-		}
+	err := p.conn.QueryRowx(`SELECT user_name, first_name, last_name, email, password FROM users WHERE user_name=$1`,
+		userName).Scan(&user.UserName, &user.FirstName, &user.LastName, &user.Email, &user.Password)
+	if err == sql.ErrNoRows {
+		return nil, errors.New("No User found with supplied username")
+	}
+	if err != nil {
+		return nil, errors.New("failed to run query against database")
+	}
+
+	return &user, nil
+}
+
+func (p *PostgresRepository) GetUserWithEmail(ctx context.Context, email string) (*User, error) {
+	var user User
+	err := p.conn.QueryRowx(`SELECT user_name, first_name, last_name, email, password FROM users WHERE email=$1`,
+		email).Scan(&user.UserName, &user.FirstName, &user.LastName, &user.Email, &user.Password)
+	if err == sql.ErrNoRows {
+		return nil, errors.New("No User found with supplied email")
 	}
 	if err != nil {
 		return nil, errors.New("failed to run query against database")
