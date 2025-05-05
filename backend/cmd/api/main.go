@@ -2,14 +2,14 @@ package main
 
 import (
 	"fmt"
-	"github.com/samallen659/invoices/backend/internal/auth"
+	"log"
+	"os"
+
 	"github.com/samallen659/invoices/backend/internal/db"
 	"github.com/samallen659/invoices/backend/internal/invoice"
 	"github.com/samallen659/invoices/backend/internal/session"
 	"github.com/samallen659/invoices/backend/internal/transport"
 	"github.com/samallen659/invoices/backend/internal/user"
-	"log"
-	"os"
 )
 
 func main() {
@@ -28,12 +28,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	usrAuth, err := auth.NewAuthenticator()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	//Invoice setup
+	// Invoice setup
 	invRepo := invoice.NewPostgresRespository(conn)
 	invSvc, err := invoice.NewService(invRepo)
 	if err != nil {
@@ -44,9 +39,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	//User setup
+	// User setup
 	usrRepo := user.NewPostgresRepository(conn)
-	usrSvc, err := user.NewService(usrAuth, usrRepo)
+	usrSvc, err := user.NewService(usrRepo)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -55,7 +50,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	server, err := transport.NewServer(invHandler, usrHandler, usrAuth)
+	server, err := transport.NewServer(invHandler, usrHandler)
 	if err != nil {
 		log.Fatal(err)
 	}

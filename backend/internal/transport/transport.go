@@ -23,10 +23,8 @@ var authenticator *auth.Authenticator
 
 type handler func(http.ResponseWriter, *http.Request)
 
-func NewServer(invHandler *invoice.Handler, usrHandler *user.Handler, a *auth.Authenticator) (*Server, error) {
+func NewServer(invHandler *invoice.Handler, usrHandler *user.Handler) (*Server, error) {
 	router := mux.NewRouter()
-
-	authenticator = a
 
 	router.HandleFunc("/invoice/{id}", user.JwtMiddleware(invHandler.HandleGetByID)).Methods(http.MethodGet)
 	router.HandleFunc("/invoice/{id}", user.JwtMiddleware(invHandler.HandleUpdate)).Methods(http.MethodPut)
