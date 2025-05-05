@@ -1,5 +1,5 @@
 #Build
-FROM golang:1.21-alpine AS BUILDER
+FROM golang:1.23-alpine AS BUILDER
 
 WORKDIR /invoices
 
