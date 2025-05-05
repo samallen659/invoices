@@ -7,7 +7,6 @@ import (
 
 	"github.com/samallen659/invoices/backend/internal/db"
 	"github.com/samallen659/invoices/backend/internal/invoice"
-	"github.com/samallen659/invoices/backend/internal/session"
 	"github.com/samallen659/invoices/backend/internal/transport"
 	"github.com/samallen659/invoices/backend/internal/user"
 )
@@ -20,8 +19,6 @@ func main() {
 
 	postgresConnStr := fmt.Sprintf("user=%s dbname=%s sslmode=disable password=%s host=%s",
 		postgresUser, postgresDB, postgresPass, postgresHost)
-
-	session.New(os.Getenv("SESSION_SECRET"))
 
 	conn, err := db.ConnectDB(postgresConnStr)
 	if err != nil {
