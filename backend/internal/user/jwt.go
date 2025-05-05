@@ -10,6 +10,8 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+type handler func(http.ResponseWriter, *http.Request)
+
 var jwtKey = []byte(fmt.Sprintf(os.Getenv("JWT_KEY")))
 
 func generateJWT(userName string) (string, error) {
@@ -22,8 +24,8 @@ func generateJWT(userName string) (string, error) {
 	return token.SignedString(jwtKey)
 }
 
-func jwtMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func JwtMiddleware(next handler) handler {
+	return (func(w http.ResponseWriter, r *http.Request) {
 		tokenStr := r.Header.Get("Authorization")
 		if tokenStr == "" || !strings.HasPrefix(tokenStr, "Bearer ") {
 			http.Error(w, "Missing token", http.StatusUnauthorized)
@@ -41,6 +43,6 @@ func jwtMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		next.ServeHTTP(w, r)
+		next(w, r)
 	})
 }
