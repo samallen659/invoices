@@ -1,5 +1,5 @@
 #Build
-FROM golang:1.23-alpine AS BUILDER
+FROM golang:1.23-alpine AS builder
 
 WORKDIR /invoices
 
@@ -16,7 +16,7 @@ FROM alpine:latest
 
 WORKDIR /
 
-COPY --from=BUILDER /api /api
+COPY --from=builder /api /api
 
 EXPOSE 80
 
