@@ -13,13 +13,22 @@ func NewService(repo Repository) (*Service, error) {
 	return &Service{repo: repo}, nil
 }
 
-func (s *Service) LoginUser(ctx context.Context, email string, userName string, password string) (bool, error) {
-	user, err := s.repo.GetUser(ctx, email, userName)
-	if err != nil {
-		return false, err
+func (s *Service) LoginUser(ctx context.Context, loginReq LoginRequest) (bool, error) {
+	var user *User
+	var err error
+	if loginReq.UserName != "" {
+		user, err = s.repo.GetUserWithUsername(ctx, loginReq.UserName)
+		if err != nil {
+			return false, err
+		}
+	} else {
+		user, err = s.repo.GetUserWithEmail(ctx, loginReq.Email)
+		if err != nil {
+			return false, err
+		}
 	}
 
-	pwdMatch, err := VerifyPassword(password, user.Password)
+	pwdMatch, err := VerifyPassword(loginReq.Password, user.Password)
 	if err != nil {
 		return false, err
 	}
@@ -46,9 +55,18 @@ func (s *Service) SignUpUser(ctx context.Context, signUpReq SignUpRequest) (bool
 }
 
 func (s *Service) GetUser(ctx context.Context, email string, userName string) (*User, error) {
-	user, err := s.repo.GetUser(ctx, email, userName)
-	if err != nil {
-		return nil, err
+	var user *User
+	var err error
+	if userName != "" {
+		user, err = s.repo.GetUserWithUsername(ctx, userName)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		user, err = s.repo.GetUserWithEmail(ctx, email)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return user, nil
