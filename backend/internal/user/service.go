@@ -31,6 +31,20 @@ func (s *Service) LoginUser(ctx context.Context, email string, userName string, 
 	return true, nil
 }
 
+func (s *Service) SignUpUser(ctx context.Context, signUpReq SignUpRequest) (bool, error) {
+	user, err := NewUser(signUpReq.UserName, signUpReq.FirstName, signUpReq.LastName, signUpReq.Email, signUpReq.Password)
+	if err != nil {
+		return false, err
+	}
+
+	err = s.repo.StoreUser(ctx, *user)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
 func (s *Service) GetUser(ctx context.Context, email string, userName string) (*User, error) {
 	user, err := s.repo.GetUser(ctx, email, userName)
 	if err != nil {
