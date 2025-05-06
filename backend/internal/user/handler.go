@@ -30,6 +30,10 @@ type GetUserRequest struct {
 	Email    string `json:"email"`
 }
 
+type DeleteUserRequest struct {
+	UserName string `json:"userName"`
+}
+
 func NewHandler(svc *Service) (*Handler, error) {
 	return &Handler{svc: svc}, nil
 }
@@ -81,7 +85,23 @@ func (h *Handler) HandleSignup(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to generate JWT", http.StatusInternalServerError)
 	}
 
-	utils.WriteJson(w, 200, `{"token":"`+jwt+`"}`)
+	utils.WriteJson(w, 201, `{"token":"`+jwt+`"}`)
+}
+
+func (h *Handler) HandleDelete(w http.ResponseWriter, r *http.Request) {
+	var deleteReq DeleteUserRequest
+
+	err := json.NewDecoder(r.Body).Decode(&deleteReq)
+	if err != nil {
+		http.Error(w, "Invalid JSON", http.StatusBadRequest)
+	}
+
+	err = h.svc.DeleteUser(r.Context(), deleteReq.UserName)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	w.WriteHeader(202)
 }
 
 func (h *Handler) HandleGetUser(w http.ResponseWriter, r *http.Request) {
