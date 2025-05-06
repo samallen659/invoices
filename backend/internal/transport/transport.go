@@ -29,7 +29,9 @@ func NewServer(invHandler *invoice.Handler, usrHandler *user.Handler) (*Server, 
 	router.HandleFunc("/invoice", user.JwtMiddleware(invHandler.HandleGetAll)).Methods(http.MethodGet)
 	router.HandleFunc("/invoice", user.JwtMiddleware(invHandler.HandleStore)).Methods(http.MethodPost)
 
-	router.HandleFunc("/user/login", usrHandler.HandleLogin).Methods(http.MethodGet)
+	router.HandleFunc("/user/login", usrHandler.HandleLogin).Methods(http.MethodPost)
+	router.HandleFunc("/user/signup", usrHandler.HandleStore).Methods(http.MethodPut)
+	router.HandleFunc("/user/delete", usrHandler.HandleDelete).Methods(http.MethodDelete)
 	router.HandleFunc("/user", user.JwtMiddleware(usrHandler.HandleGetUser)).Methods(http.MethodGet)
 
 	methods := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE"})
